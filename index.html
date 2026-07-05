@@ -1238,6 +1238,40 @@ var CHAMPIONS_DATA = [
 
 // ── CONFIG ────────────────────────────────────────────────────
 var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby3zbL4dIWX9QEGhU99oYvahd89u7X_cG8_h0iWUI7MFvub3LQNYTHhoGcJnmlreepe/exec';
+
+// Shim: when served outside GAS (GitHub Pages etc.), replace google.script.run
+// with fetch() calls to the GAS JSON endpoints.
+(function() {
+  if (typeof google !== 'undefined' && google.script && google.script.run) return;
+  var GAS_MAP = {
+    whWAGetPrimaryForClient:     'data',
+    whWAGetStatsForClient:       'stats',
+    whWAGetPlayersForClient:     'players',
+    whWAGetGameBoardsForClient:  'gameboards',
+    whWAGetAllTimeForClient:     'alltime',
+    whWAGetTournamentsForClient: 'tournaments',
+    whWAGetQRowsForClient:       'quarterrows'
+  };
+  function makeRunner_(ok, fail) {
+    var r = {
+      withSuccessHandler: function(fn) { return makeRunner_(fn, fail); },
+      withFailureHandler: function(fn) { return makeRunner_(ok, fn); }
+    };
+    Object.keys(GAS_MAP).forEach(function(method) {
+      r[method] = function(arg) {
+        var url = WEBAPP_URL + '?get=' + GAS_MAP[method];
+        if (method === 'whWAGetQRowsForClient' && arg) url += '&quarter=' + encodeURIComponent(arg);
+        fetch(url)
+          .then(function(res) { return res.json(); })
+          .then(function(j)   { if (ok)   ok(j); })
+          .catch(function(e)  { if (fail) fail(e); });
+      };
+    });
+    return r;
+  }
+  window.google = { script: { run: makeRunner_(null, null) } };
+})();
+
 var GAME_KEYS  = ['holdem','omaha','omaha_hi_lo','royal','stud7','stud7hilo'];
 var GAME_ABBR  = {holdem:"H'em", omaha:'Omaha', omaha_hi_lo:'OH/L', royal:'Royal', stud7:'Stud7', stud7hilo:'SH/L'};
 var GAME_FULL  = {holdem:"Texas Hold'em", omaha:'Omaha', omaha_hi_lo:'Omaha Hi/Lo', royal:'Royal', stud7:'Seven-Card Stud', stud7hilo:'Stud Hi/Lo'};

@@ -1,2283 +1,922 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weedwoman420's WILDHORSES</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ── RESET & ROOT ─────────────────────────────────────────── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
+/*
+@OnlyCurrentDoc
+*/
+function uploadCellImageToDiscord(imageBlob) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  // 1. Get your image blob (Assuming you stored it or just generated it)
+  // If you are grabbing an image existing in a cell, you'd usually have the blob
+  // from the function that created it. For this example, let's call it 'imageBlob'.
+  // Example: var imageBlob = chart.getAs('image/png').setName("report.png");
+  
+  if (!imageBlob) {
+    console.error("No image blob found.");
+    return;
+  }
 
-/* ── DARK THEME (default) ────────────────────────────────── */
-:root {
-  --wh:          #5891ad;
-  --wh-light:    #7db3cc;
-  --wh-dim:      #3d6b87;
-  --wh-dark:     #1e4560;
-  --wh-glow:     rgba(88,145,173,0.35);
-  --gold:        #f0c040;
-  --gold-d:      #c09020;
-  --silver:      #b0c4d0;
-  --silver-d:    #8090a0;
-  --bronze:      #cd8050;
-  --bronze-d:    #905030;
-  --bg-page:     #070e17;
-  --bg-card:     #0d1a28;
-  --bg-panel:    #111e2e;
-  --bg-row:      #162235;
-  --bg-row-alt:  #0f1b2a;
-  --bg-input:    #0d1a28;
-  --text-main:   #d4e8f8;
-  --text-title:  #eef4ff;
-  --text-dim:    #6898b8;
-  --text-muted:  #2f4a60;
-  --border:      #1a2f45;
-  --border-wh:   #244060;
-  --pill-bg:     #12223a;
-  --pill-active: #5891ad;
-  --pill-text:   #7aadcc;
-  --green:       #4caf6e;
-  --red:         #c44a4a;
-  --rank-bg:     #0f1b2a;
-  --loading-bg:  #070e17;
-  --shadow:      rgba(0,0,0,0.5);
-  --table-hdr:   #0a1620;
-  --scrollbar:   #1a2f45;
-  --scrollbar-t: #5891ad;
-}
+  const webhookUrl = "https://forum.casino.org/t/weedwoman420s-wildhorses-poker-league/37500/";
 
-/* ── LIGHT THEME ─────────────────────────────────────────── */
-body.light {
-  --wh:          #1e6090;
-  --wh-light:    #2a80b4;
-  --wh-dim:      #155272;
-  --wh-dark:     #0d3a58;
-  --wh-glow:     rgba(30,96,144,0.2);
-  --gold:        #b08000;
-  --gold-d:      #806000;
-  --silver:      #4a6070;
-  --silver-d:    #304050;
-  --bronze:      #9a5828;
-  --bronze-d:    #6a3818;
-  --bg-page:     #eef4f8;
-  --bg-card:     #ffffff;
-  --bg-panel:    #f0f6fa;
-  --bg-row:      #f8fbfd;
-  --bg-row-alt:  #eef4f8;
-  --bg-input:    #ffffff;
-  --text-main:   #1a2a3a;
-  --text-title:  #0d1e2e;
-  --text-dim:    #3a5a78;
-  --text-muted:  #8aabcc;
-  --border:      #c0d4e4;
-  --border-wh:   #8ab8d8;
-  --pill-bg:     #ddedf8;
-  --pill-active: #1e6090;
-  --pill-text:   #1e5070;
-  --green:       #1a7a40;
-  --red:         #9b2020;
-  --rank-bg:     #f0f6fa;
-  --loading-bg:  #eef4f8;
-  --shadow:      rgba(0,40,80,0.12);
-  --table-hdr:   #ddedf8;
-  --scrollbar:   #c0d4e4;
-  --scrollbar-t: #1e6090;
-}
 
-/* ── SCROLLBAR ───────────────────────────────────────────── */
-::-webkit-scrollbar{width:6px;height:6px;}
-::-webkit-scrollbar-track{background:var(--scrollbar);}
-::-webkit-scrollbar-thumb{background:var(--scrollbar-t);border-radius:3px;}
-
-/* ── BODY ────────────────────────────────────────────────── */
-body {
-  background: var(--bg-page);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  transition: background .3s, color .3s;
-  overflow-x: hidden;
-}
-
-/* ── LOADING SCREEN ──────────────────────────────────────── */
-#loading-screen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--loading-bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 28px;
-}
-.ls-title {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(20px, 4vw, 36px);
-  font-weight: 700;
-  color: var(--wh-light);
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
-.ls-sub {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  color: var(--text-dim);
-  letter-spacing: .12em;
-}
-.ls-spinner {
-  width: 48px; height: 48px;
-  border: 3px solid var(--border-wh);
-  border-top-color: var(--wh);
-  border-radius: 50%;
-  animation: spin .9s linear infinite;
-}
-.ls-msg { font-size: 13px; color: var(--text-dim); }
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── ERROR SCREEN ────────────────────────────────────────── */
-#error-screen {
-  display: none;
-  position: fixed; inset: 0; z-index: 9998;
-  background: var(--loading-bg);
-  align-items: center; justify-content: center; flex-direction: column; gap: 20px;
-}
-#error-screen.visible { display: flex; }
-.err-box {
-  background: var(--bg-card);
-  border: 1px solid var(--red);
-  border-radius: 10px;
-  padding: 32px 40px;
-  max-width: 480px;
-  text-align: center;
-}
-.err-box h2 { color: var(--red); margin-bottom: 12px; font-family:'Cinzel',serif; }
-.err-box p  { color: var(--text-dim); margin-bottom: 20px; font-size: 13px; }
-
-/* ── MAIN APP ────────────────────────────────────────────── */
-#app { display:none; flex-direction:column; min-height:100vh; }
-#app.visible { display:flex; }
-
-/* ── HEADER ──────────────────────────────────────────────── */
-.site-header {
-  background: linear-gradient(180deg, #020a14 0%, var(--bg-card) 100%);
-  border-bottom: 2px solid var(--border-wh);
-  padding: 20px 16px 16px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-body.light .site-header {
-  background: linear-gradient(180deg, #d0e8f8 0%, var(--bg-card) 100%);
-}
-.site-header::before {
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;bottom:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 50% 0%, var(--wh-glow), transparent);
-  pointer-events:none;
-}
-.hdr-runes {
-  font-size: 11px;
-  color: var(--wh-dim);
-  letter-spacing: .4em;
-  margin-bottom: 6px;
-  font-family: 'Cinzel', serif;
-  opacity: .7;
-}
-.hdr-title {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-weight: 700;
-  font-size: clamp(20px, 4.5vw, 44px);
-  color: var(--wh-light);
-  letter-spacing: .06em;
-  line-height: 1.15;
-  text-shadow: 0 0 28px var(--wh-glow), 0 2px 0 rgba(0,0,0,.5);
-}
-body.light .hdr-title { color: var(--wh-dark); }
-.hdr-sub {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  margin-top: 4px;
-  margin-bottom: 14px;
-}
-.hdr-avatar-wrap {
-  margin: 0 auto 14px;
-  display: flex; align-items: center; justify-content: center;
-}
-.hdr-avatar {
-  width: 96px; height: 96px;
-  border-radius: 50%;
-  border: 3px solid var(--wh);
-  box-shadow: 0 0 20px var(--wh-glow), 0 0 0 1px var(--border-wh);
-  object-fit: cover;
-  display: block;
-  transition: box-shadow .3s;
-}
-.hdr-avatar:hover {
-  box-shadow: 0 0 32px var(--wh-glow), 0 0 0 2px var(--wh-light);
-}
-.hdr-controls {
-  display: flex; align-items: center; justify-content: center;
-  gap: 10px; flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-.hdr-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px;
-  border: 1px solid var(--border-wh);
-  border-radius: 20px;
-  background: var(--bg-panel);
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: .05em;
-}
-.hdr-badge .dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.85);}}
-.hdr-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 14px;
-  border: 1px solid var(--border-wh);
-  border-radius: 20px;
-  background: var(--bg-panel);
-  color: var(--text-dim);
-  font-size: 11px;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: all .2s;
-  letter-spacing: .04em;
-}
-.hdr-btn:hover { background: var(--bg-row); border-color: var(--wh); color: var(--wh-light); }
-.hdr-updated { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
-
-/* ── LAYOUT ──────────────────────────────────────────────── */
-.app-body { display:flex; flex:1; overflow:hidden; }
-
-.sidebar {
-  width: 180px;
-  flex-shrink: 0;
-  background: var(--bg-card);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  overflow-y: auto;
-  padding: 12px 0;
-}
-.sidebar-group-label {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: .14em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  padding: 14px 16px 4px;
-}
-.nav-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 9px 16px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text-dim);
-  border-left: 3px solid transparent;
-  transition: all .15s;
-  user-select: none;
-}
-.nav-item:hover { background: var(--bg-panel); color: var(--text-main); }
-.nav-item.active {
-  background: var(--bg-panel);
-  color: var(--wh-light);
-  border-left-color: var(--wh);
-  font-weight: 500;
-}
-body.light .nav-item.active { color: var(--wh); }
-.nav-icon { font-size: 15px; width: 18px; text-align:center; }
-
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 20px;
-  min-width: 0;
-}
-
-/* ── SECTION ─────────────────────────────────────────────── */
-.section { display:none; }
-.section.active { display:block; }
-
-/* ── SECTION HEADER ──────────────────────────────────────── */
-.sec-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 18px; gap: 12px; flex-wrap: wrap;
-}
-.sec-title {
-  font-family: 'Cinzel', serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--wh-light);
-  letter-spacing: .06em;
-}
-body.light .sec-title { color: var(--wh-dark); }
-
-/* ── PILLS ───────────────────────────────────────────────── */
-.pill-bar {
-  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
-}
-.pill {
-  padding: 4px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--border-wh);
-  background: var(--pill-bg);
-  color: var(--pill-text);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all .15s;
-  user-select: none;
-  font-family: 'Inter', sans-serif;
-  white-space: nowrap;
-}
-.pill:hover { border-color: var(--wh-light); color: var(--wh-light); }
-.pill.active {
-  background: var(--pill-active);
-  color: #fff;
-  border-color: var(--pill-active);
-  font-weight: 500;
-}
-
-/* ── CONTROLS BAR ────────────────────────────────────────── */
-.controls-bar {
-  display: flex; align-items: center; gap: 12px;
-  flex-wrap: wrap; margin-bottom: 16px;
-}
-.control-group { display:flex; align-items:center; gap:8px; }
-.control-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  white-space: nowrap;
-}
-select.app-select {
-  padding: 5px 10px;
-  border: 1px solid var(--border-wh);
-  border-radius: 6px;
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  outline: none;
-}
-select.app-select:focus { border-color: var(--wh); }
-
-input.app-search {
-  padding: 5px 12px;
-  border: 1px solid var(--border-wh);
-  border-radius: 20px;
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 12px;
-  font-family: 'Inter', sans-serif;
-  outline: none;
-  width: 180px;
-  transition: border .2s;
-}
-input.app-search:focus { border-color: var(--wh); }
-input.app-search::placeholder { color: var(--text-muted); }
-
-/* ── CARD ────────────────────────────────────────────────── */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-
-/* ── PODIUM ──────────────────────────────────────────────── */
-.podium-wrap {
-  display: flex; align-items: flex-end; justify-content: center;
-  gap: 20px; padding: 24px 20px 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-.podium-player {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  text-align: center;
-}
-.pp-avatar {
-  width: 108px; height: 108px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  font-size: 44px;
-  border: 3px solid currentColor;
-  box-shadow: 0 0 16px currentColor;
-}
-.pp-avatar.rank-1 { color: var(--gold);   background: rgba(240,192,64,.12);  width:124px;height:124px;font-size:52px; }
-.pp-avatar.rank-2 { color: var(--silver); background: rgba(176,196,208,.1); }
-.pp-avatar.rank-3 { color: var(--bronze); background: rgba(205,128,80,.1); }
-.pp-rank { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .12em; }
-.pp-name { font-size: 12px; color: var(--text-main); font-weight: 500; max-width: 120px; word-break: break-word; }
-.pp-pts  { font-family: 'Cinzel', serif; font-size: 13px; color: var(--wh-light); }
-.pp-pedestal {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  width: 130px;
-}
-.pp-block {
-  width: 130px; border-radius: 4px 4px 0 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Cinzel', serif; font-weight: 700;
-}
-.pp-block.b1 { height: 50px; background: rgba(240,192,64,.18); color: var(--gold);   font-size: 24px; }
-.pp-block.b2 { height: 36px; background: rgba(176,196,208,.12); color: var(--silver); font-size: 20px; }
-.pp-block.b3 { height: 26px; background: rgba(205,128,80,.1); color: var(--bronze); font-size: 17px; }
-.podium-game-label {
-  width: 100%;
-  text-align: center;
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  color: var(--wh-light);
-  padding: 0 16px 12px;
-  letter-spacing: .06em;
-}
-.no-data {
-  text-align: center; padding: 40px 20px;
-  color: var(--text-muted); font-style: italic; font-size: 13px;
-}
-
-/* ── TABLE ───────────────────────────────────────────────── */
-.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table {
-  width: 100%; border-collapse: collapse; font-size: 13px;
-  white-space: nowrap;
-}
-thead th {
-  background: var(--table-hdr);
-  color: var(--wh-light);
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  padding: 9px 10px;
-  text-align: center;
-  border-bottom: 2px solid var(--border-wh);
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-}
-thead th:hover { color: var(--wh-light); background: var(--bg-row); }
-thead th.sort-asc::after  { content: ' ▲'; font-size: 9px; }
-thead th.sort-desc::after { content: ' ▼'; font-size: 9px; }
-tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
-tbody tr:nth-child(odd)  { background: var(--bg-row); }
-tbody tr:nth-child(even) { background: var(--bg-row-alt); }
-tbody tr:hover { background: var(--bg-panel); }
-tbody td { padding: 7px 10px; text-align: center; color: var(--text-main); }
-td.td-player { text-align: left; font-weight: 500; }
-td.td-rank { font-family:'Cinzel',serif; font-weight:700; font-size:12px; min-width:34px; }
-td.rank-1 { color: var(--gold);   }
-td.rank-2 { color: var(--silver); }
-td.rank-3 { color: var(--bronze); }
-td.rank-other { color: var(--text-dim); }
-td.td-total { font-weight: 600; color: var(--wh-light); font-size:13px; }
-td.td-zero { color: var(--text-muted); }
-td.td-pts { font-size: 12px; }
-td.td-chips-pos { color: var(--green); }
-td.td-chips-neg { color: var(--red);   }
-.search-highlight { background: rgba(88,145,173,.25); border-radius: 2px; }
-.hidden-row { display: none; }
-
-/* ── STAT CARDS ──────────────────────────────────────────── */
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  text-align: center;
-}
-.stat-card .sc-label {
-  font-size: 10px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  margin-bottom: 8px;
-}
-.stat-card .sc-val {
-  font-family: 'Cinzel', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--wh-light);
-}
-body.light .stat-card .sc-val { color: var(--wh); }
-.stat-card .sc-name {
-  font-size: 11px;
-  color: var(--text-main);
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-/* ── LEADERS GRID ────────────────────────────────────────── */
-.leaders-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
-}
-.leader-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.leader-card-hdr {
-  background: var(--border-wh);
-  padding: 8px 14px;
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  color: var(--wh-light);
-  letter-spacing: .06em;
-  font-weight: 600;
-}
-body.light .leader-card-hdr { background: var(--border-wh); color: #fff; }
-.leader-list { padding: 6px 0; }
-.leader-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 5px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.leader-row:last-child { border-bottom: none; }
-.lr-rank { font-family:'Cinzel',serif; font-weight:700; font-size:12px; width:22px; }
-.lr-rank.r1 { color:var(--gold); }
-.lr-rank.r2 { color:var(--silver); }
-.lr-rank.r3 { color:var(--bronze); }
-.lr-rank.rN { color:var(--text-muted); }
-.lr-player { flex:1; font-size:12px; color:var(--text-main); font-weight:500; overflow:hidden; text-overflow:ellipsis; }
-.lr-val { font-size:12px; color:var(--wh-light); font-weight:600; white-space:nowrap; }
-body.light .lr-val { color: var(--wh); }
-
-/* ── CALENDAR ────────────────────────────────────────────── */
-.cal-controls {
-  display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;
-}
-.cal-tz-pills { display:flex; gap:6px; flex-wrap:wrap; }
-.cal-grid { display: flex; flex-direction: column; gap: 10px; }
-.cal-day {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-.cal-day-hdr {
-  background: var(--border-wh);
-  padding: 8px 14px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 6px;
-}
-body.light .cal-day-hdr { background: var(--wh); }
-.cal-day-date {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  letter-spacing: .05em;
-}
-.cal-day-count {
-  font-size: 11px;
-  color: rgba(255,255,255,.65);
-  font-style: italic;
-}
-.cal-event {
-  display: flex; align-items: flex-start; gap: 14px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.cal-event:last-child { border-bottom: none; }
-.cal-time {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  color: var(--wh-light);
-  font-weight: 600;
-  min-width: 58px;
-  white-space: nowrap;
-}
-body.light .cal-time { color: var(--wh); }
-.cal-body { flex: 1; }
-.cal-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-main);
-  margin-bottom: 2px;
-}
-.cal-name a { color: inherit; text-decoration: none; }
-.cal-name a:hover { color: var(--wh-light); text-decoration: underline; }
-.cal-meta { font-size: 11px; color: var(--text-dim); }
-.cal-status {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .05em;
-  white-space: nowrap;
-  align-self: flex-start;
-  margin-top: 1px;
-}
-.status-running   { background: rgba(76,175,110,.15); color: var(--green); border: 1px solid rgba(76,175,110,.3); }
-.status-complete  { background: rgba(88,145,173,.1);  color: var(--wh-dim); border: 1px solid var(--border-wh); }
-.status-announced { background: rgba(240,192,64,.1);  color: var(--gold-d); border: 1px solid rgba(240,192,64,.25); }
-body.light .status-announced { color: var(--gold); }
-.cal-empty { padding: 32px; text-align: center; color: var(--text-muted); font-style: italic; font-size: 13px; }
-
-/* ── RESULTS ─────────────────────────────────────────────── */
-.results-header {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 16px;
-  display: flex; gap: 24px; flex-wrap: wrap;
-}
-.rh-stat { text-align: center; min-width: 80px; }
-.rh-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; }
-.rh-val {
-  font-family: 'Cinzel', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--wh-light);
-  margin-top: 2px;
-}
-body.light .rh-val { color: var(--wh); }
-
-/* ── PLAYER REPORT ───────────────────────────────────────── */
-.pr-controls {
-  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-.pr-field { display:flex; flex-direction:column; gap:5px; }
-.pr-field label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
-.pr-report-area {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.pr-summary {
-  display: flex; gap: 16px; flex-wrap: wrap;
-  padding: 16px 20px;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border);
-}
-.pr-sum-block { text-align: center; }
-.pr-sum-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .1em; }
-.pr-sum-val {
-  font-family: 'Cinzel', serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--wh-light);
-}
-body.light .pr-sum-val { color: var(--wh); }
-.pr-best-4-note {
-  font-size: 10px;
-  color: var(--text-muted);
-  font-style: italic;
-  padding: 6px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.pr-counted { background: rgba(88,145,173,.08); }
-
-/* ── GAME BADGE ──────────────────────────────────────────── */
-.game-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  white-space: nowrap;
-}
-.gb-holdem     { background: rgba(88,145,173,.18); color: var(--wh-light); }
-.gb-omaha      { background: rgba(240,192,64,.12); color: var(--gold-d); }
-.gb-omaha_hi_lo{ background: rgba(205,128,80,.15); color: var(--bronze); }
-.gb-royal      { background: rgba(160,90,180,.15); color: #c080e0; }
-.gb-stud7      { background: rgba(76,175,110,.12); color: var(--green); }
-.gb-stud7hilo  { background: rgba(200,80,80,.12);  color: #e08080; }
-body.light .gb-omaha { color: var(--gold); }
-
-/* ── FOOTER ──────────────────────────────────────────────── */
-.site-footer {
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
-  text-align: center;
-  padding: 10px 16px;
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: .06em;
-}
-
-/* ── SPINNER IN SECTION ──────────────────────────────────── */
-.sec-spinner {
-  display: flex; align-items: center; justify-content: center;
-  padding: 60px 20px; gap: 12px; color: var(--text-dim); font-size: 13px;
-}
-.sec-spinner::before {
-  content:'';
-  width: 24px; height: 24px;
-  border: 2px solid var(--border-wh);
-  border-top-color: var(--wh);
-  border-radius: 50%;
-  animation: spin .9s linear infinite;
-  flex-shrink: 0;
-}
-
-/* ── APP BTN ─────────────────────────────────────────────── */
-.app-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 16px;
-  border: 1px solid var(--border-wh);
-  border-radius: 6px;
-  background: var(--bg-panel);
-  color: var(--wh-light);
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .15s;
-}
-.app-btn:hover { background: var(--wh); color: #fff; border-color: var(--wh); }
-body.light .app-btn { color: var(--wh); }
-body.light .app-btn:hover { background: var(--wh); color: #fff; }
-
-/* ── ALL-TIME TABLE ──────────────────────────────────────── */
-.at-section-hdr {
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--wh-light);
-  letter-spacing: .08em;
-  padding: 20px 0 12px;
-  border-top: 1px solid var(--border-wh);
-  margin-top: 20px;
-}
-body.light .at-section-hdr { color: var(--wh-dark); }
-.at-cat-bar {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
-}
-.at-cat-btn {
-  padding: 6px 18px;
-  border-radius: 6px;
-  border: 1px solid var(--border-wh);
-  background: var(--pill-bg);
-  color: var(--pill-text);
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .05em;
-  cursor: pointer;
-  transition: all .15s;
-  white-space: nowrap;
-}
-.at-cat-btn:hover { border-color: var(--wh-light); color: var(--wh-light); }
-.at-cat-btn.active {
-  background: var(--wh);
-  color: #fff;
-  border-color: var(--wh);
-}
-.at-tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.at-tbl-wrap table { min-width: 400px; }
-.at-tbl-wrap thead th { position: sticky; top: 0; z-index: 2; }
-.at-q-col { min-width: 60px; }
-.at-total-col { min-width: 72px; font-weight: 700; color: var(--wh-light) !important; }
-body.light .at-total-col { color: var(--wh) !important; }
-.at-zero { color: var(--text-muted); }
-.at-pos { color: var(--green); }
-.at-neg { color: var(--red); }
-
-/* ── PLAQUE BOARD (Champions) ────────────────────────────── */
-.plaque-board {
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(90,45,0,.04) 0, rgba(90,45,0,.04) 2px,
-      transparent 2px, transparent 18px
-    ),
-    linear-gradient(170deg,
-      #7a5220 0%, #9a6e32 10%, #8a5f28 22%,
-      #ae7d40 32%, #8a5f28 44%, #9a6e32 58%,
-      #7a5220 68%, #a07838 80%, #8a5f28 92%, #9a6e32 100%
-    );
-  border: 10px solid #4a2e08;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: inset 0 2px 12px rgba(255,200,80,.12), 0 8px 40px rgba(0,0,0,.7);
-}
-
-.plaque-board-hdr {
-  display: flex; align-items: center; gap: 20px;
-  background: #0c0c0c;
-  border: 2px solid #707070;
-  border-radius: 8px;
-  padding: 18px 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.5);
-}
-.plaque-board-hdr img {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  border: 2px solid #909090;
-  flex-shrink: 0;
-  object-fit: cover;
-}
-.plaque-board-hdr-title {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(15px, 3vw, 26px);
-  font-weight: 700;
-  color: #e8d090;
-  letter-spacing: .06em;
-  line-height: 1.35;
-}
-
-.plaque-year-group { margin-bottom: 16px; }
-.plaque-year-label {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: #c09050;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  padding-left: 2px;
-  text-shadow: 0 1px 4px rgba(0,0,0,.4);
-}
-
-.plaque-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
-  gap: 10px;
-}
-
-.plaque {
-  background: #0d0d0d;
-  border: 1.5px solid #606060;
-  border-radius: 10px;
-  padding: 11px 14px 13px;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.06),
-    inset 0 -2px 6px rgba(0,0,0,.5),
-    0 6px 18px rgba(0,0,0,.55);
-}
-.plaque-period {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: #d4b060;
-  letter-spacing: .05em;
-  text-align: center;
-  border-bottom: 1px solid #363636;
-  padding-bottom: 7px;
-  margin-bottom: 8px;
-  line-height: 1.35;
-}
-.plaque-row-item {
-  display: flex; align-items: baseline; gap: 4px;
-  margin-top: 4px;
-  font-size: 11px;
-  line-height: 1.35;
-}
-.plaque-label { color: #787878; white-space: nowrap; flex-shrink: 0; }
-.plaque-val   { color: #d0d0d0; font-weight: 600; word-break: break-word; }
-.plaque-val.same { color: #b8c8d8; }
-.plaque-same-note {
-  text-align: center;
-  font-size: 10px;
-  color: #606060;
-  font-style: italic;
-  margin-top: 5px;
-}
-
-/* ── RESPONSIVE ──────────────────────────────────────────── */
-@media(max-width:680px) {
-  .sidebar { display:none; }
-  .main-content { padding: 12px; }
-  .hdr-title { font-size: 18px; }
-}
-</style>
-</head>
-<body>
-
-<!-- LOADING SCREEN -->
-<div id="loading-screen">
-  <div class="ls-title">Weedwoman420's WILDHORSES</div>
-  <div class="ls-spinner"></div>
-  <div class="ls-msg" id="ls-msg">Loading leaderboard data…</div>
-  <div class="ls-sub">♦ WILDHORSES POKER LEAGUE ♦</div>
-</div>
-
-<!-- ERROR SCREEN -->
-<div id="error-screen">
-  <div class="err-box">
-    <h2>⚠ Load Error</h2>
-    <p id="err-msg">Could not fetch leaderboard data. Please refresh the page.</p>
-    <button class="app-btn" onclick="loadData(true)">↺ Retry</button>
-  </div>
-</div>
-
-<!-- MAIN APP -->
-<div id="app">
-
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="hdr-runes">♠ ♦ ♣ ♥ WILDHORSES POKER LEAGUE ♥ ♣ ♦ ♠</div>
-    <h1 class="hdr-title">Weedwoman420's<br>WILDHORSES</h1>
-    <div class="hdr-sub">Leaderboard &amp; Stats</div>
-    <div class="hdr-avatar-wrap">
-      <img class="hdr-avatar" src="https://raw.githubusercontent.com/RainsPlace/Avatars/main/WW420WILDHORSES/WW420WH.png"
-           alt="Wildhorses Logo" onerror="this.style.display='none'">
-    </div>
-    <div class="hdr-controls">
-      <span class="hdr-badge"><span class="dot"></span>Live Data</span>
-      <button class="hdr-btn" onclick="loadData(true)">↺ Refresh</button>
-      <button class="hdr-btn" id="theme-btn" onclick="toggleTheme()">☀ Light</button>
-    </div>
-    <div class="hdr-updated" id="hdr-updated"></div>
-  </header>
-
-  <!-- BODY -->
-  <div class="app-body">
-
-    <!-- SIDEBAR -->
-    <nav class="sidebar">
-      <div class="sidebar-group-label">Standings</div>
-      <div class="nav-item active" data-tab="leaderboard">
-        <span class="nav-icon">🏆</span> Leaderboard
-      </div>
-      <div class="nav-item" data-tab="games">
-        <span class="nav-icon">♠</span> Games
-      </div>
-      <div class="sidebar-group-label">History</div>
-      <div class="nav-item" data-tab="results">
-        <span class="nav-icon">🎯</span> Latest Game
-      </div>
-      <div class="nav-item" data-tab="calendar">
-        <span class="nav-icon">📅</span> Calendar
-      </div>
-      <div class="sidebar-group-label">Insights</div>
-      <div class="nav-item" data-tab="leaders">
-        <span class="nav-icon">📊</span> Leaders
-      </div>
-      <div class="nav-item" data-tab="alltime">
-        <span class="nav-icon">🏅</span> All-Time
-      </div>
-      <div class="nav-item" data-tab="champions">
-        <span class="nav-icon">🏆</span> Champions
-      </div>
-      <div class="nav-item" data-tab="playerreport">
-        <span class="nav-icon">🔍</span> Player Report
-      </div>
-    </nav>
-
-    <!-- MAIN -->
-    <main class="main-content">
-
-      <!-- ── LEADERBOARD ─────────────────────────────────── -->
-      <section id="sec-leaderboard" class="section active">
-        <div class="sec-header">
-          <div class="sec-title">Overall Leaderboard</div>
-          <div class="controls-bar" style="margin-bottom:0;">
-            <div class="control-group">
-              <span class="control-label">Quarter</span>
-              <select class="app-select" id="lb-quarter-sel" onchange="onLbQuarterChange()"></select>
-            </div>
-            <input type="text" class="app-search" id="lb-search" placeholder="Search player…" oninput="filterLbTable()">
-          </div>
-        </div>
-
-        <!-- Slot pills -->
-        <div class="pill-bar" style="margin-bottom:16px;">
-          <span class="pill active" data-slot="ALL" onclick="setLbSlot('ALL',this)">All Games</span>
-          <span class="pill"        data-slot="AM"  onclick="setLbSlot('AM',this)">10 AM</span>
-          <span class="pill"        data-slot="PM"  onclick="setLbSlot('PM',this)">7 PM</span>
-        </div>
-
-        <!-- Podium -->
-        <div id="lb-podium" class="podium-wrap"></div>
-
-        <!-- Table -->
-        <div class="card">
-          <div class="tbl-wrap">
-            <table id="lb-table">
-              <thead>
-                <tr>
-                  <th onclick="sortLbTable('rank')">Rank</th>
-                  <th onclick="sortLbTable('player')" style="text-align:left;">Player</th>
-                  <th onclick="sortLbTable('total')">Total</th>
-                  <th onclick="sortLbTable('holdem')" title="Texas Hold'em">H'em</th>
-                  <th onclick="sortLbTable('omaha')" title="Omaha">Omaha</th>
-                  <th onclick="sortLbTable('omaha_hi_lo')" title="Omaha Hi/Lo">OH/L</th>
-                  <th onclick="sortLbTable('royal')" title="Royal">Royal</th>
-                  <th onclick="sortLbTable('stud7')" title="Seven-Card Stud">Stud7</th>
-                  <th onclick="sortLbTable('stud7hilo')" title="Stud Hi/Lo">SH/L</th>
-                </tr>
-              </thead>
-              <tbody id="lb-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── GAMES ───────────────────────────────────────── -->
-      <section id="sec-games" class="section">
-        <div class="sec-header">
-          <div class="sec-title">Per-Game Leaderboard</div>
-          <div class="control-group">
-            <span class="control-label">Quarter</span>
-            <select class="app-select" id="gm-quarter-sel" onchange="renderGames()"></select>
-          </div>
-        </div>
-
-        <!-- Game selector pills -->
-        <div class="pill-bar" style="margin-bottom:10px;">
-          <span class="pill active" data-gk="holdem"      onclick="setGameKey('holdem',this)">♠ Hold'em</span>
-          <span class="pill"        data-gk="omaha"       onclick="setGameKey('omaha',this)">◆ Omaha</span>
-          <span class="pill"        data-gk="omaha_hi_lo" onclick="setGameKey('omaha_hi_lo',this)">◇ Omaha Hi/Lo</span>
-          <span class="pill"        data-gk="royal"       onclick="setGameKey('royal',this)">♛ Royal</span>
-          <span class="pill"        data-gk="stud7"       onclick="setGameKey('stud7',this)">🃏 Stud 7</span>
-          <span class="pill"        data-gk="stud7hilo"   onclick="setGameKey('stud7hilo',this)">♜ Stud Hi/Lo</span>
-        </div>
-
-        <!-- Slot pills -->
-        <div class="pill-bar" style="margin-bottom:16px;">
-          <span class="pill active" data-gslot="ALL" onclick="setGmSlot('ALL',this)">All</span>
-          <span class="pill"        data-gslot="AM"  onclick="setGmSlot('AM',this)">10 AM</span>
-          <span class="pill"        data-gslot="PM"  onclick="setGmSlot('PM',this)">7 PM</span>
-        </div>
-
-        <div id="gm-podium" class="podium-wrap"></div>
-
-        <div class="card">
-          <div class="tbl-wrap">
-            <table id="gm-table">
-              <thead>
-                <tr>
-                  <th onclick="sortGmTable('rank')">Rank</th>
-                  <th style="text-align:left;" onclick="sortGmTable('player')">Player</th>
-                  <th onclick="sortGmTable('points')">Best-4 Pts</th>
-                  <th onclick="sortGmTable('games')">Games</th>
-                </tr>
-              </thead>
-              <tbody id="gm-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── RESULTS ─────────────────────────────────────── -->
-      <section id="sec-results" class="section">
-        <div class="sec-header">
-          <div class="sec-title">Latest Game Results</div>
-        </div>
-        <div id="results-content"></div>
-      </section>
-
-      <!-- ── CALENDAR ────────────────────────────────────── -->
-      <section id="sec-calendar" class="section">
-        <div class="sec-header">
-          <div class="sec-title">Tournament Calendar</div>
-        </div>
-        <div class="cal-controls">
-          <div>
-            <div class="control-label" style="margin-bottom:6px;">Timezone</div>
-            <div class="cal-tz-pills" id="cal-tz-pills">
-              <span class="pill active" data-tz="America/New_York"    onclick="setCalTZ('America/New_York',this)">EST</span>
-              <span class="pill"        data-tz="America/Chicago"     onclick="setCalTZ('America/Chicago',this)">CST</span>
-              <span class="pill"        data-tz="America/Denver"      onclick="setCalTZ('America/Denver',this)">MST</span>
-              <span class="pill"        data-tz="America/Los_Angeles" onclick="setCalTZ('America/Los_Angeles',this)">PST</span>
-              <span class="pill"        data-tz="Europe/London"       onclick="setCalTZ('Europe/London',this)">GMT</span>
-              <span class="pill"        data-tz="Europe/Paris"        onclick="setCalTZ('Europe/Paris',this)">CET</span>
-              <span class="pill"        data-tz="Australia/Sydney"    onclick="setCalTZ('Australia/Sydney',this)">AEST</span>
-            </div>
-          </div>
-          <div>
-            <div class="control-label" style="margin-bottom:6px;">Filter</div>
-            <div class="pill-bar" id="cal-filter-pills">
-              <span class="pill active" data-cf="all"      onclick="setCalFilter('all',this)">All</span>
-              <span class="pill"        data-cf="upcoming" onclick="setCalFilter('upcoming',this)">Upcoming</span>
-              <span class="pill"        data-cf="running"  onclick="setCalFilter('running',this)">Running</span>
-              <span class="pill"        data-cf="complete" onclick="setCalFilter('complete',this)">Complete</span>
-            </div>
-          </div>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
-      </section>
-
-      <!-- ── LEADERS ─────────────────────────────────────── -->
-      <section id="sec-leaders" class="section">
-        <div class="sec-header">
-          <div class="sec-title">League Leaders</div>
-          <div class="control-group">
-            <span class="control-label">Period</span>
-            <select class="app-select" id="ld-period-sel" onchange="renderLeaders()"></select>
-          </div>
-        </div>
-        <div id="leaders-content"></div>
-      </section>
-
-      <!-- ── ALL-TIME RECORDS ───────────────────────────── -->
-      <section id="sec-alltime" class="section">
-        <div class="sec-header">
-          <div class="sec-title">All-Time Records</div>
-        </div>
-        <div class="at-cat-bar">
-          <button class="at-cat-btn active" data-at="points" onclick="setAtCat('points',this)">🏆 Points</button>
-          <button class="at-cat-btn"        data-at="wins"   onclick="setAtCat('wins',this)">🥇 Wins</button>
-          <button class="at-cat-btn"        data-at="chips"  onclick="setAtCat('chips',this)">💰 Chips</button>
-          <button class="at-cat-btn"        data-at="itm"    onclick="setAtCat('itm',this)">🏅 ITM</button>
-          <button class="at-cat-btn"        data-at="roi"    onclick="setAtCat('roi',this)">📈 ROI</button>
-        </div>
-        <div class="card">
-          <div class="at-tbl-wrap">
-            <table id="at-table">
-              <thead><tr id="at-thead-row"></tr></thead>
-              <tbody id="at-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── CHAMPIONS ──────────────────────────────────── -->
-      <section id="sec-champions" class="section">
-        <div class="sec-header">
-          <div class="sec-title">Previous Champions</div>
-        </div>
-        <div class="plaque-board">
-          <div class="plaque-board-hdr">
-            <img src="https://raw.githubusercontent.com/RainsPlace/Avatars/main/WW420WILDHORSES/WW420WH.png"
-                 alt="Wildhorses" onerror="this.style.display='none'">
-            <div class="plaque-board-hdr-title">WEEDWOMAN420's<br>WILDHORSES<br>POKER LEAGUE<br>CHAMPIONS</div>
-          </div>
-          <div id="champ-plaques"></div>
-        </div>
-      </section>
-
-      <!-- ── PLAYER REPORT ───────────────────────────────── -->
-      <section id="sec-playerreport" class="section">
-        <div class="sec-header">
-          <div class="sec-title">Player Report</div>
-        </div>
-        <div class="pr-controls">
-          <div class="pr-field">
-            <label>Quarter</label>
-            <select class="app-select" id="pr-quarter-sel" onchange="onPrQuarterChange()"></select>
-          </div>
-          <div class="pr-field">
-            <label>Player</label>
-            <select class="app-select" id="pr-player-sel" style="min-width:160px;"></select>
-          </div>
-          <button class="app-btn" onclick="runPlayerReport()">View Report</button>
-        </div>
-        <div id="pr-report-area"></div>
-      </section>
-
-    </main>
-  </div>
-
-  <footer class="site-footer">♦ WILDHORSES POKER LEAGUE — Powered by Replay Poker ♦</footer>
-</div>
-
-<script>
-// ── CHAMPIONS DATA ────────────────────────────────────────────
-// Grouped by year; each entry: { period, points, bounties }
-// Edit this list when a new quarter concludes.
-var CHAMPIONS_DATA = [
-  { year:'2023', period:'2023 QTR 1',          points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2023', period:'2023 QTR 2',          points:'Goatsoup',      bounties:'Goatsoup'                 },
-  { year:'2023', period:'2023 QTR 3',          points:'Goatsoup',      bounties:'Goatsoup'                 },
-  { year:'2023', period:'2023 QTR 4',          points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2024', period:'2024 QTR 1',          points:'Dreamer2023',   bounties:'OHIOJAKE'                 },
-  { year:'2024', period:'2024 QTR 2',          points:'ROTTWEILER',    bounties:'Dreamer2023'              },
-  { year:'2024', period:'2024 QTR 3 MORNING',  points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2024', period:'2024 QTR 3 PRIMETIME',points:'southwestmba',  bounties:'Dreamer2023'              },
-  { year:'2024', period:'2024 QTR 4 OVERALL',  points:'_RAIN_',        bounties:'_RAIN_'                   },
-  { year:'2024', period:'2024 QTR 4 MORNING',  points:'_RAIN_',        bounties:'_snowman_'                },
-  { year:'2024', period:'2024 QTR 4 PRIMETIME',points:'_RAIN_',        bounties:'_RAIN_'                   },
-  { year:'2025', period:'2025 QTR 1 OVERALL',  points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 1 MORNING',  points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 1 PRIMETIME',points:'southwestmba',  bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 2 OVERALL',  points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 2 MORNING',  points:'Excaliburns',   bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 2 PRIMETIME',points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 3 OVERALL',  points:'CANTFIXSTUPID', bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 3 MORNING',  points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2025', period:'2025 QTR 3 PRIMETIME',points:'CANTFIXSTUPID', bounties:'CANTFIXSTUPID'            },
-  { year:'2025', period:'2025 QTR 4 OVERALL',  points:'CANTFIXSTUPID', bounties:'CANTFIXSTUPID'            },
-  { year:'2025', period:'2025 QTR 4 MORNING',  points:'CANTFIXSTUPID', bounties:'CANTFIXSTUPID'            },
-  { year:'2025', period:'2025 QTR 4 PRIMETIME',points:'_snowman_',     bounties:'CANTFIXSTUPID'            },
-  { year:'2026', period:'2026 QTR 1 OVERALL',  points:'_snowman_',     bounties:'_snowman_'                },
-  { year:'2026', period:'2026 QTR 1 MORNING',  points:'_snowman_',     bounties:'jujube'                   },
-  { year:'2026', period:'2026 QTR 1 PRIMETIME',points:'southwestmba',  bounties:'_snowman_'                },
-  { year:'2026', period:'2026 QTR 2 OVERALL',  points:'CANTFIXSTUPID', bounties:'CANTFIXSTUPID'            },
-  { year:'2026', period:'2026 QTR 2 MORNING',  points:'CANTFIXSTUPID', bounties:'CANTFIXSTUPID'            },
-  { year:'2026', period:'2026 QTR 2 PRIMETIME',points:'Excaliburns',   bounties:'CANTFIXSTUPID, Excaliburns'},
-];
-
-// ── CONFIG ────────────────────────────────────────────────────
-var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby3zbL4dIWX9QEGhU99oYvahd89u7X_cG8_h0iWUI7MFvub3LQNYTHhoGcJnmlreepe/exec';
-
-// Shim: when served outside GAS (GitHub Pages etc.), replace google.script.run
-// with fetch() calls to the GAS JSON endpoints.
-(function() {
-  if (typeof google !== 'undefined' && google.script && google.script.run) return;
-  var GAS_MAP = {
-    whWAGetPrimaryForClient:     'data',
-    whWAGetStatsForClient:       'stats',
-    whWAGetPlayersForClient:     'players',
-    whWAGetGameBoardsForClient:  'gameboards',
-    whWAGetAllTimeForClient:     'alltime',
-    whWAGetTournamentsForClient: 'tournaments',
-    whWAGetQRowsForClient:       'quarterrows'
+  // 2. Build the multipart payload
+  // We send the file AND the JSON 'payload_json' in the same request
+  const payload = {
+    "file": imageBlob,
+    "payload_json": JSON.stringify({
+      "content": "Latest Tounament Results:",
+      "embeds": [{
+        "image": {
+          "url": "attachment://report.png" // This tells Discord to look at the attached file
+        }
+      }]
+    })
   };
-  function makeRunner_(ok, fail) {
-    var r = {
-      withSuccessHandler: function(fn) { return makeRunner_(fn, fail); },
-      withFailureHandler: function(fn) { return makeRunner_(ok, fn); }
+
+  const options = {
+    "method": "post",
+    "payload": payload, // Note: Do NOT use JSON.stringify here
+    "muteHttpExceptions": true
+  };
+
+  // 3. Send to Discord
+  try {
+    const response = UrlFetchApp.fetch(webhookUrl, options);
+    console.log("Status: " + response.getResponseCode());
+  } catch (e) {
+    console.error("Upload failed: " + e.toString());
+  }
+}
+
+function sendToForum() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Report"); // Change to your sheet name
+  
+  // 1. Pull data from a specific row (e.g., Row 2)
+  const row = 2; 
+  //const name = sheet.getRange(row, 1).getValue();    // Column A
+  const imageUrl = sheet.getRange("A31").getValue(); // Column B
+  const lburl = sheet.getRange("K10").getValue();  // Column C
+  const tags = sheet.getRange("K12").getValue();  // Column C
+
+  // 2. Your stored Webhook and Cookie validation logic
+  const webhookUrl = "https://forum.casino.org/t/weedwoman420s-wildhorses-poker-league/37500/";
+  
+  // 3. Construct the Payload with Sheet Data
+  const payload = {
+    "embeds": [{
+      "title": "Tournament Results",
+     // "color": 3447003, // Blue color
+      "image": {
+        "url": imageUrl // Pulled from Column B
+      },
+      "description": lburl,
+
+      "footer": {
+        "text": tags
+      }
+    }]
+  };
+
+  const options = {
+    "method": "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(payload),
+    "muteHttpExceptions": true
+  };
+
+  // 4. Send the request
+  try {
+    const response = UrlFetchApp.fetch(webhookUrl, options);
+    if (response.getResponseCode() === 204 || response.getResponseCode() === 200) {
+      console.log("Success! Post created for " + name);
+    } else {
+      console.error("Error: " + response.getContentText());
+    }
+  } catch (e) {
+    console.error("Fetch failed: " + e.toString());
+  }
+}
+
+
+function grantEditorAccessToAllProtections(email) {
+  email = "rosebrook.andy@gmail.com";
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const protections = ss.getProtections(SpreadsheetApp.ProtectionType.RANGE)
+    .concat(ss.getProtections(SpreadsheetApp.ProtectionType.SHEET));
+
+  protections.forEach(protection => {
+    if (protection.canEdit()) {
+      const editors = protection.getEditors();
+      if (!editors.map(e => e.getEmail()).includes(email)) {
+        protection.addEditor(email);
+      }
+    }
+  });
+
+  Logger.log(`Editor ${email} has been added to all protected ranges.`);
+}
+
+function deleteBrokenNamedRanges() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var namedRanges = spreadsheet.getNamedRanges();
+  for (var i = 0; i < namedRanges.length; i++) {
+    Logger.log(namedRanges[i].getName());
+    try {
+      // Attempts to access the range to check if it's broken
+      Logger.log(namedRanges[i].getRange().getA1Notation());
+    } catch (e) {
+      // If it fails (broken), remove the range
+      Logger.log("Removing " + namedRanges[i].getName());
+      namedRanges[i].remove();
+    }
+  }
+}
+
+/**
+ * Logs the name and A1 notation of all named ranges in the active spreadsheet.
+ */
+function logNamedRangesDetails() {
+  // Get the active spreadsheet
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Get all named ranges in the spreadsheet
+  var namedRanges = ss.getNamedRanges(); //
+  
+  if (namedRanges.length === 0) {
+    Logger.log("No named ranges found in the spreadsheet.");
+    return;
+  }
+  
+  Logger.log("Named Ranges in Spreadsheet:");
+  
+  // Iterate through each named range
+  for (var i = 0; i < namedRanges.length; i++) {
+    var namedRange = namedRanges[i];
+    var name = namedRange.getName(); // Get the name of the named range
+    
+    // Get the range object and its A1 notation
+    var range = namedRange.getRange(); 
+    var a1Notation = range.getA1Notation(); 
+    var sheetName = range.getSheet().getName(); // Get the name of the sheet
+    
+    // Log the name and the full reference (SheetName!A1Notation)
+    Logger.log("Name: " + name + " | Range: " + sheetName + "!" + a1Notation);
+  }
+}
+
+function deleteRanges() {
+  const namedRanges = ['OmahaHL7pm','OmahaHL10am', 'OmahaHLOverall', 'OmahaOverall', 'Stud10AM', 'Stud7pm', 'StudOverall'];
+  namedRanges.forEach(range => deleteSpecificNamedRange(range));
+}
+function deleteSpecificNamedRange(nameOfRangeToDelete) {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // The removeNamedRange method takes the name of the named range as a string.
+  spreadsheet.removeNamedRange(nameOfRangeToDelete);
+  
+  Logger.log('Named range "%s" deleted (if it existed).', nameOfRangeToDelete);
+}
+
+function logAllSheetNames() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet(); // Gets the currently active spreadsheet
+  var sheets = spreadsheet.getSheets(); // Gets all sheets as an array of Sheet objects
+  
+  Logger.log("List of all sheet names:");
+  
+  for (var i = 0; i < sheets.length; i++) {
+    var sheetName = sheets[i].getName(); // Gets the name of the current sheet
+    Logger.log(sheetName); 
+  }
+}
+
+function myPermissions() {
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+}
+
+const urlbase = "https://casino.org/replaypoker/";
+
+function foo () {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Report");
+  var chatData = arrayToString(sheet.getRange("K3:K5").getValues());
+  console.log(chatData);
+}
+
+
+
+/**
+ * Track Spreadsheet views with Google Analytics
+ *
+ * @param {string} gaaccount Google Analytics Account like G-YZ9999999999.
+ * @param {string} spreadsheet Name of the Google Spreadsheet.
+ * @param {string} sheetname Name of individual Google Sheet.
+ * @return The 1x1 tracking GIF image
+ * @customfunction
+ */
+
+function GOOGLEANALYTICS(gaaccount, spreadsheet, sheetname) {
+  // GA4 update based on https://www.labnol.org/internet/track-google-spreadsheets/29107/
+  var imageURL = [
+    'https://www.google-analytics.com/g/collect?v=2&en=page_view',
+    '&tid=' + gaaccount,
+    '&cid=' + Utilities.getUuid(),
+    '&sid=' + Math.round(Date.now() / 1000).toString(),
+    '&ep.event_category=' + encodeURIComponent('Google Spreadsheets'),
+    '&ep.event_action=' + encodeURIComponent(spreadsheet || 'Spreadsheet'),
+    '&ep.event_label=' + encodeURIComponent(sheetname || 'Sheet')
+  ].join('');
+
+  return imageURL;
+}
+
+
+function onOpen() {
+
+  var ui = SpreadsheetApp.getUi();
+ 
+//These lines create the menu items and 
+// tie them to functions we will write in Apps Script
+  
+  ui.createMenu('Custom_Tasks')
+      .addItem('Process Next Tournament', 'confirmNextTournament')
+      .addItem('Get New Tournament IDs', 'getNewTournamentIDs')
+      .addItem('Get Members', 'getMembers')
+      .addItem('Tournament Report', 'generateAndShowReport')
+      .addSeparator()
+      .addSubMenu(ui.createMenu('Build Sheets')
+         .addItem('▶ Build ALL Sheets (fast)', 'buildAllSheets')
+         .addItem('▶ Build ALL Sheets + Resize Columns', 'buildAllSheetsWithResize')
+         .addSeparator()
+         .addItem('Current Quarter — All Sheets', 'buildAllCurrentSheets')
+         .addSeparator()
+         .addItem('Leaderboard', 'buildLeaderboard')
+         .addItem('Points Overview', 'buildPointsOverview')
+         .addItem('Bounties Overview', 'buildBountiesOverview')
+         .addItem('Bounties Leaderboard', 'buildBountiesLeaderboard')
+         .addItem('Points Leaderboard (10AM + 7PM)', 'buildPointsLeaderboard')
+         .addItem('Statistics', 'buildStatistics')
+         .addItem('Summary', 'buildSummary')
+         .addItem('All Game Sheets (Holdem, Omaha, etc.)', 'buildAllGameSheets')
+         .addItem('Position Totals', 'buildPositionTotals')
+         .addItem('Position Totals By Game', 'buildPositionTotalsByGame')
+         .addItem('Tournaments Played', 'buildPlayerInfo')
+         .addItem('Current Leaders', 'buildCurrentLeaders')
+         .addSeparator()
+         .addItem('All-Time — Points by Quarter', 'buildAllTimePoints')
+         .addItem('All-Time — Wins / ITM', 'buildAllTimeWinsITM')
+         .addItem('All-Time — Chips / Bounties', 'buildAllTimeChipsBounties')
+         .addItem('All-Time — ROI', 'buildAllTimeROI'))
+      .addSeparator()
+      .addSubMenu(ui.createMenu('Advanced Options')
+         .addItem('💣 Reprocess All Tournaments', 'rerunAll')
+         .addItem('💣 Reset Schedule Data', 'resetScheduleData')
+         .addItem('💣 Clear All Data', 'clearAllData'))
+      .addSeparator()
+      .addItem('Quarter Config', 'setupQuarterConfig')
+      .addSeparator()
+      .addSubMenu(ui.createMenu('Admin Tasks')
+         .addSubMenu(ui.createMenu('Admin (Auto-Login)')
+           .addItem('Set My Credentials Sheet', 'replaySetCreds')
+           .addItem('Test Login',               'replayTestLogin')
+           .addItem('Check My Setup',           'replayCheckSetup')
+           .addItem('Check Action Hash',        'replayCheckHash')
+           .addItem('Clear Session Cache',      'replayClearCache')))
+      .addToUi();
+  ui.createMenu('Navigation')
+    .addItem('Show Navigation Menu', 'showSheetSidebar')
+    .addToUi();
+}
+
+// ── ReplayLogin library wrappers ────────────────────────────────
+function replaySetCreds()   { ReplayPokerLogin.setMyCredentialsSheet(); }
+function replayTestLogin()  { ReplayPokerLogin.testLogin(); }
+function replayCheckSetup() { ReplayPokerLogin.checkMySetup(); }
+function replayCheckHash()  { ReplayPokerLogin.checkActionHash(); }
+function replayClearCache() { ReplayPokerLogin.clearSessionCache(); }
+// ── End auth wrappers ────────────────────────────────────────────
+
+function showSheetSidebar() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  
+  var html = `
+    <style>
+      body { font-family: Arial, sans-serif; padding: 10px; }
+      .sidebar-header {
+        background-color: #5891ad; /* pivot table green */
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      ul { padding: 0; list-style: none; }
+      li { margin: 5px 0; }
+      a {
+        text-decoration: none;
+        color: #5891ad;
+        font-weight: bold;
+      }
+      a:hover { text-decoration: underline; }
+    </style>
+    <div class="sidebar-header">📑 Sheet Navigation</div>
+    <ul>`;
+
+  sheets.forEach(sheet => {
+    var sheetName = sheet.getName();
+    html += `<li><a href="#" onclick="google.script.run.goToSheet('${sheetName}')">${sheetName}</a></li>`;
+  });
+
+  html += `</ul>`;
+
+  var htmlOutput = HtmlService.createHtmlOutput(html)
+    .setTitle("Navigation") // Title still needed but won't be styled
+    .setWidth(250);
+
+  SpreadsheetApp.getUi().showSidebar(htmlOutput);
+}
+
+function goToSheet(sheetName) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (sheet) {
+    ss.setActiveSheet(sheet);
+  } else {
+    SpreadsheetApp.getUi().alert("Sheet not found!");
+  }
+}
+
+
+
+function GetSheetName() {
+  return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
+} 
+
+
+function getMembers() {
+  var url = "https://www.casino.org/replaypoker/api/v2/leagues/58";
+
+  var options = {
+    headers: { 'Cookie': ReplayPokerLogin.getSessionCookies(), 'Accept': 'application/json' },
+    'muteHttpExceptions' : true
+  };
+
+  var json = JSON.parse(UrlFetchApp.fetch(url, options).getContentText());
+  //var json = getJSONData();
+  var memberlist = json.league.members;
+  var members = memberlist.map(function (member) {
+    return member.username;
+  });
+  members.push("_Rain_","Weedwoman420","_snowman_");
+  //const mem1 = members.flat();
+  const sortedStrs = [...members].sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+  const memlist = sortedStrs.map((x) => [x]);
+  console.log(memlist);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Members");
+  sheet.getRange(2, 1, memlist.length).setValues(memlist);
+}
+
+
+function confirmNextTournament() {
+  var gameinfo = getGameInfo();
+  if (showAlert(gameinfo.processmsg) == 0) {
+    return false;
+  }
+  processNextTournament(gameinfo);
+}
+
+function processNextTournament (gameinfo) {
+  if (["", null, undefined].includes(gameinfo) ) {
+    gameinfo = getGameInfo();
+  }
+
+  Logger.log("Processing " + JSON.stringify(gameinfo));
+  var result = getTournamentData(gameinfo);
+  if (result) {
+    deleteIntervalTriggers();
+  }
+}
+
+function getTournamentData(gameinfo) {
+    var options = {
+      headers: { 'Cookie': ReplayPokerLogin.getSessionCookies(), 'Accept': 'application/json' },
+      'muteHttpExceptions' : true
     };
-    Object.keys(GAS_MAP).forEach(function(method) {
-      r[method] = function(arg) {
-        var url = WEBAPP_URL + '?get=' + GAS_MAP[method];
-        if (method === 'whWAGetQRowsForClient' && arg) url += '&quarter=' + encodeURIComponent(arg);
-        fetch(url)
-          .then(function(res) { return res.json(); })
-          .then(function(j)   { if (ok)   ok(j); })
-          .catch(function(e)  { if (fail) fail(e); });
-      };
-    });
-    return r;
-  }
-  window.google = { script: { run: makeRunner_(null, null) } };
-})();
+    var raw = JSON.parse(UrlFetchApp.fetch(gameinfo.url, options).getContentText());
+    var json = raw.tournament || raw;
 
-var GAME_KEYS  = ['holdem','omaha','omaha_hi_lo','royal','stud7','stud7hilo'];
-var GAME_ABBR  = {holdem:"H'em", omaha:'Omaha', omaha_hi_lo:'OH/L', royal:'Royal', stud7:'Stud7', stud7hilo:'SH/L'};
-var GAME_FULL  = {holdem:"Texas Hold'em", omaha:'Omaha', omaha_hi_lo:'Omaha Hi/Lo', royal:'Royal', stud7:'Seven-Card Stud', stud7hilo:'Stud Hi/Lo'};
+    // Check tournament State to see if it is finished
+    if (["finished", "archived"].includes(json.state) ) {
+      // Good to process
+      //json = Object.assign(json, gameinfo);  // add gameinfo to json to pass to functions
+      json.gameinfo = gameinfo;
 
-// ── STATE ─────────────────────────────────────────────────────
-var PRIMARY      = null;
-var GAME_BOARDS  = null;
-var STATS_DATA   = null;
-var PR_PLAYERS   = null;
-var PR_QR_CACHE  = {};
-var TOURNAMENTS  = null;
-
-var gameBoardsLoading = false;
-var statsLoading      = false;
-var prPlayersLoading  = false;
-var tournsLoading     = false;
-
-var STATE = {
-  tab:        'leaderboard',
-  quarter:    '',
-  slot:       'ALL',
-  gameKey:    'holdem',
-  gameSlot:   'ALL',
-  theme:      'dark',
-  calTZ:      'America/New_York',
-  calFilter:  'all',
-  lbSort:     {col:'rank', asc:true},
-  gmSort:     {col:'rank', asc:true}
-};
-var LD_SORT = { col: 'points', asc: false };
-
-// ── INIT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  var stored = localStorage.getItem('wh_theme');
-  if (stored === 'light') applyTheme('light');
-
-  document.querySelectorAll('.nav-item').forEach(function(el) {
-    el.addEventListener('click', function() { switchTab(el.dataset.tab); });
-  });
-
-  loadData(false);
-});
-
-// ── THEME ─────────────────────────────────────────────────────
-function toggleTheme() {
-  applyTheme(STATE.theme === 'dark' ? 'light' : 'dark');
-}
-function applyTheme(t) {
-  STATE.theme = t;
-  document.body.classList.toggle('light', t === 'light');
-  var btn = document.getElementById('theme-btn');
-  if (btn) btn.textContent = t === 'dark' ? '☀ Light' : '🌙 Dark';
-  localStorage.setItem('wh_theme', t);
-}
-
-// ── DATA LOADING ──────────────────────────────────────────────
-function loadData(force) {
-  if (!force) {
-    var cached = sessionStorage.getItem('wh_primary');
-    if (cached) {
-      try {
-        var p = JSON.parse(cached);
-        if (p && p.leaderboard) { applyPrimary(p); hideLoading(); return; }
-      } catch(e) {}
-    }
-  }
-  setLsMsg('Fetching live data from Google Sheets…');
-  google.script.run
-    .withSuccessHandler(function(j) {
-      if (j && j.error) {
-        document.getElementById('err-msg').textContent = j.error;
-        document.getElementById('error-screen').classList.add('visible');
-        document.getElementById('loading-screen').style.display = 'none';
-        return;
-      }
-      try { sessionStorage.setItem('wh_primary', JSON.stringify(j)); } catch(e) {}
-      applyPrimary(j);
-      hideLoading();
-    })
-    .withFailureHandler(function(e) {
-      document.getElementById('err-msg').textContent = (e && e.message) || 'Network error.';
-      document.getElementById('error-screen').classList.add('visible');
-      document.getElementById('loading-screen').style.display = 'none';
-    })
-    .whWAGetPrimaryForClient();
-}
-
-function applyPrimary(p) {
-  PRIMARY = p;
-  PRIMARY.tournaments = TOURNAMENTS || [];  // may already be loaded
-  STATE.quarter = p.activeQuarter || ((p.leaderboard && p.leaderboard.quarters && p.leaderboard.quarters[0]) || '');
-  populateQuarterSelects(p.leaderboard ? p.leaderboard.quarters : []);
-  if (p.updated) {
-    var d = new Date(p.updated);
-    document.getElementById('hdr-updated').textContent =
-      'Updated: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
-  }
-  renderAll();
-  // Fetch tournament calendar data separately (needs auth — would timeout if bundled)
-  ensureTournaments(function(){});
-}
-
-function hideLoading() {
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-}
-
-function setLsMsg(m) { document.getElementById('ls-msg').textContent = m; }
-
-function ensureGameBoards(cb) {
-  if (GAME_BOARDS) { cb(); return; }
-  if (gameBoardsLoading) { setTimeout(function(){ensureGameBoards(cb);}, 200); return; }
-  gameBoardsLoading = true;
-  google.script.run
-    .withSuccessHandler(function(j){
-      if (j && j.data) GAME_BOARDS = j.data;
-      gameBoardsLoading = false;
-      cb();
-    })
-    .withFailureHandler(function(){ gameBoardsLoading = false; cb(); })
-    .whWAGetGameBoardsForClient();
-}
-
-function ensureStats(cb) {
-  if (STATS_DATA) { cb(); return; }
-  if (statsLoading) { setTimeout(function(){ensureStats(cb);}, 200); return; }
-  statsLoading = true;
-  google.script.run
-    .withSuccessHandler(function(j){
-      if (j && j.stats) STATS_DATA = j.stats;
-      statsLoading = false;
-      cb();
-    })
-    .withFailureHandler(function(){ statsLoading = false; cb(); })
-    .whWAGetStatsForClient();
-}
-
-function ensurePrPlayers(cb) {
-  if (PR_PLAYERS) { cb(); return; }
-  if (prPlayersLoading) { setTimeout(function(){ensurePrPlayers(cb);}, 200); return; }
-  prPlayersLoading = true;
-  google.script.run
-    .withSuccessHandler(function(j){
-      PR_PLAYERS = j;
-      prPlayersLoading = false;
-      cb();
-    })
-    .withFailureHandler(function(){ prPlayersLoading = false; cb(); })
-    .whWAGetPlayersForClient();
-}
-
-function ensureTournaments(cb) {
-  if (TOURNAMENTS) { cb(); return; }
-  if (tournsLoading) { setTimeout(function(){ ensureTournaments(cb); }, 300); return; }
-  tournsLoading = true;
-  google.script.run
-    .withSuccessHandler(function(j){
-      TOURNAMENTS = (j && j.tournaments) ? j.tournaments : [];
-      tournsLoading = false;
-      if (PRIMARY) PRIMARY.tournaments = TOURNAMENTS;
-      renderCalendar();
-      cb();
-    })
-    .withFailureHandler(function(){ tournsLoading = false; TOURNAMENTS = []; cb(); })
-    .whWAGetTournamentsForClient();
-}
-
-function ensureQRows(quarter, cb) {
-  if (PR_QR_CACHE[quarter]) { cb(PR_QR_CACHE[quarter]); return; }
-  google.script.run
-    .withSuccessHandler(function(j){
-      if (j && j.rows) { PR_QR_CACHE[quarter] = j; }
-      cb(j || {});
-    })
-    .withFailureHandler(function(){ cb({}); })
-    .whWAGetQRowsForClient(quarter);
-}
-
-// ── TAB ───────────────────────────────────────────────────────
-function switchTab(tab) {
-  STATE.tab = tab;
-  document.querySelectorAll('.nav-item').forEach(function(el) {
-    el.classList.toggle('active', el.dataset.tab === tab);
-  });
-  document.querySelectorAll('.section').forEach(function(el) {
-    el.classList.toggle('active', el.id === 'sec-' + tab);
-  });
-  if (tab === 'games')        onGamesTabOpen();
-  if (tab === 'leaders')      onLeadersTabOpen();
-  if (tab === 'alltime')      onAlltimeTabOpen();
-  if (tab === 'champions')    renderChampions();
-  if (tab === 'playerreport') onPrTabOpen();
-  if (tab === 'calendar')     ensureTournaments(function(){ renderCalendar(); });
-}
-
-// ── QUARTER SELECTS ───────────────────────────────────────────
-function populateQuarterSelects(quarters) {
-  var els = ['lb-quarter-sel','gm-quarter-sel'];
-  els.forEach(function(id) {
-    var sel = document.getElementById(id);
-    if (!sel) return;
-    sel.innerHTML = '';
-    quarters.forEach(function(q) {
-      var o = document.createElement('option');
-      o.value = q; o.textContent = q;
-      if (q === STATE.quarter) o.selected = true;
-      sel.appendChild(o);
-    });
-  });
-}
-
-function onLbQuarterChange() {
-  var sel = document.getElementById('lb-quarter-sel');
-  if (sel) STATE.quarter = sel.value;
-  renderLeaderboard();
-}
-
-// ── RENDER ALL ────────────────────────────────────────────────
-function renderAll() {
-  renderLeaderboard();
-  renderResults();
-  renderCalendar();
-}
-
-// ── LEADERBOARD ───────────────────────────────────────────────
-function setLbSlot(slot, el) {
-  STATE.slot = slot;
-  document.querySelectorAll('[data-slot]').forEach(function(e){ e.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderLeaderboard();
-}
-
-function renderLeaderboard() {
-  if (!PRIMARY || !PRIMARY.leaderboard) return;
-  var lb  = PRIMARY.leaderboard;
-  var ql  = document.getElementById('lb-quarter-sel');
-  var q   = ql ? ql.value : STATE.quarter;
-  var rows = (lb.data[q] && lb.data[q][STATE.slot]) || [];
-
-  renderPodium('lb-podium', rows, 'Overall — ' + GAME_FULL[GAME_KEYS[0]]);
-  renderLbTable(rows);
-}
-
-function renderPodium(containerId, rows, gameLabel) {
-  var el = document.getElementById(containerId);
-  if (!el) return;
-
-  var top3 = rows.slice(0, 3);
-  if (!top3.length) { el.innerHTML = '<div class="no-data">No data for this period</div>'; return; }
-
-  var rankClass = ['rank-1','rank-2','rank-3'];
-  var blockClass = ['b1','b2','b3'];
-  var blockNum   = ['1','2','3'];
-
-  // Order: 2nd | 1st | 3rd for podium layout
-  var order = [1,0,2].filter(function(i){return i < top3.length;});
-
-  var html = '';
-  if (gameLabel) html += '<div class="podium-game-label">' + gameLabel + '</div>';
-
-  order.forEach(function(i) {
-    var p = top3[i];
-    var rc = rankClass[i] || '';
-    var bc = blockClass[i] || 'b3';
-    var init = ((p.player || '?').replace(/^_+/, '') || '?').charAt(0).toUpperCase();
-    var pts  = fmtNum(p.total !== undefined ? p.total : p.points);
-    var rankLabel = i === 0 ? '1st' : i === 1 ? '2nd' : '3rd';
-    html += '<div class="pp-pedestal">' +
-              '<div class="pp-avatar ' + rc + '">' + init + '</div>' +
-              '<div class="pp-pts">' + pts + '</div>' +
-              '<div class="pp-name">' + esc(p.player) + '</div>' +
-              '<div class="pp-rank">' + rankLabel + '</div>' +
-              '<div class="pp-block ' + bc + '">' + blockNum[i] + '</div>' +
-            '</div>';
-  });
-
-  el.innerHTML = html;
-}
-
-function renderLbTable(rows) {
-  var tbody = document.getElementById('lb-tbody');
-  if (!tbody) return;
-
-  var sorted = sortLbRows(rows);
-
-  var html = '';
-  sorted.forEach(function(r) {
-    var rc = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
-    html += '<tr class="lb-row">' +
-      '<td class="td-rank ' + rc + '">' + r.rank + '</td>' +
-      '<td class="td-player">' + esc(r.player) + '</td>' +
-      '<td class="td-total">' + fmtNum(r.total) + '</td>';
-    GAME_KEYS.forEach(function(gk) {
-      var v = r.g ? (r.g[gk] || 0) : 0;
-      html += '<td class="td-pts' + (v===0?' td-zero':'') + '">' + (v===0?'—':fmtNum(v)) + '</td>';
-    });
-    html += '</tr>';
-  });
-  tbody.innerHTML = html || '<tr><td colspan="9" class="no-data">No data for this period</td></tr>';
-  filterLbTable();
-  highlightLbSort();
-}
-
-function sortLbRows(rows) {
-  var arr = rows.slice();
-  var col = STATE.lbSort.col, asc = STATE.lbSort.asc;
-  arr.sort(function(a,b) {
-    var va, vb;
-    if (col === 'rank')   { va=a.rank;  vb=b.rank; }
-    else if (col==='player') { va=a.player.toLowerCase(); vb=b.player.toLowerCase(); }
-    else if (col==='total')  { va=a.total; vb=b.total; }
-    else { va=a.g?a.g[col]||0:0; vb=b.g?b.g[col]||0:0; }
-    if (va<vb) return asc?-1:1;
-    if (va>vb) return asc?1:-1;
-    return 0;
-  });
-  return arr;
-}
-
-function sortLbTable(col) {
-  if (STATE.lbSort.col === col) STATE.lbSort.asc = !STATE.lbSort.asc;
-  else { STATE.lbSort.col = col; STATE.lbSort.asc = col==='rank'||col==='player'; }
-  if (!PRIMARY || !PRIMARY.leaderboard) return;
-  var ql = document.getElementById('lb-quarter-sel');
-  var q  = ql ? ql.value : STATE.quarter;
-  var rows = (PRIMARY.leaderboard.data[q] && PRIMARY.leaderboard.data[q][STATE.slot]) || [];
-  renderLbTable(rows);
-}
-
-function highlightLbSort() {
-  var ths = document.querySelectorAll('#lb-table thead th');
-  var cols = ['rank','player','total'].concat(GAME_KEYS);
-  ths.forEach(function(th, i) {
-    th.classList.remove('sort-asc','sort-desc');
-    if (cols[i] === STATE.lbSort.col) {
-      th.classList.add(STATE.lbSort.asc ? 'sort-asc' : 'sort-desc');
-    }
-  });
-}
-
-function filterLbTable() {
-  var q = (document.getElementById('lb-search')||{}).value || '';
-  q = q.toLowerCase().trim();
-  document.querySelectorAll('#lb-tbody tr.lb-row').forEach(function(tr) {
-    var name = (tr.querySelector('.td-player')||{}).textContent || '';
-    tr.classList.toggle('hidden-row', q && name.toLowerCase().indexOf(q) < 0);
-  });
-}
-
-// ── GAMES TAB ─────────────────────────────────────────────────
-function setGameKey(gk, el) {
-  STATE.gameKey = gk;
-  document.querySelectorAll('[data-gk]').forEach(function(e){ e.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderGames();
-}
-
-function setGmSlot(slot, el) {
-  STATE.gameSlot = slot;
-  document.querySelectorAll('[data-gslot]').forEach(function(e){ e.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderGames();
-}
-
-function onGamesTabOpen() {
-  var sel = document.getElementById('gm-quarter-sel');
-  if (sel && !sel.value && PRIMARY && PRIMARY.leaderboard) {
-    populateQuarterSelects(PRIMARY.leaderboard.quarters);
-    if (PRIMARY.leaderboard.quarters.length) sel.value = STATE.quarter;
-  }
-  ensureGameBoards(function() { renderGames(); });
-}
-
-function renderGames() {
-  if (!GAME_BOARDS) {
-    document.getElementById('gm-tbody').innerHTML = '<tr><td colspan="4"><div class="sec-spinner">Loading game data…</div></td></tr>';
-    return;
-  }
-  var gsel = document.getElementById('gm-quarter-sel');
-  var q    = gsel ? gsel.value : STATE.quarter;
-  var rows = (GAME_BOARDS[q] && GAME_BOARDS[q][STATE.gameKey] && GAME_BOARDS[q][STATE.gameKey][STATE.gameSlot]) || [];
-
-  renderPodium('gm-podium', rows, GAME_FULL[STATE.gameKey]);
-  renderGmTable(rows);
-}
-
-function renderGmTable(rows) {
-  var tbody = document.getElementById('gm-tbody');
-  if (!tbody) return;
-  var sorted = sortGmRows(rows);
-  var html = '';
-  sorted.forEach(function(r) {
-    var rc = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
-    html += '<tr>' +
-      '<td class="td-rank ' + rc + '">' + r.rank + '</td>' +
-      '<td class="td-player">' + esc(r.player) + '</td>' +
-      '<td class="td-total">' + fmtNum(r.points) + '</td>' +
-      '<td class="td-pts">' + r.games + '</td>' +
-    '</tr>';
-  });
-  tbody.innerHTML = html || '<tr><td colspan="4" class="no-data">No data</td></tr>';
-  highlightGmSort();
-}
-
-function sortGmRows(rows) {
-  var arr = rows.slice();
-  var col = STATE.gmSort.col, asc = STATE.gmSort.asc;
-  arr.sort(function(a,b) {
-    var va = a[col]||0, vb = b[col]||0;
-    if (col==='player') { va=a.player.toLowerCase(); vb=b.player.toLowerCase(); }
-    if (va<vb) return asc?-1:1;
-    if (va>vb) return asc?1:-1;
-    return 0;
-  });
-  return arr;
-}
-
-function sortGmTable(col) {
-  if (STATE.gmSort.col===col) STATE.gmSort.asc=!STATE.gmSort.asc;
-  else { STATE.gmSort.col=col; STATE.gmSort.asc=col==='rank'||col==='player'; }
-  if (!GAME_BOARDS) return;
-  var gsel = document.getElementById('gm-quarter-sel');
-  var q    = gsel ? gsel.value : STATE.quarter;
-  var rows = (GAME_BOARDS[q]&&GAME_BOARDS[q][STATE.gameKey]&&GAME_BOARDS[q][STATE.gameKey][STATE.gameSlot])||[];
-  renderGmTable(rows);
-}
-
-function highlightGmSort() {
-  var ths = document.querySelectorAll('#gm-table thead th');
-  var cols = ['rank','player','points','games'];
-  ths.forEach(function(th,i){
-    th.classList.remove('sort-asc','sort-desc');
-    if (cols[i]===STATE.gmSort.col) th.classList.add(STATE.gmSort.asc?'sort-asc':'sort-desc');
-  });
-}
-
-// ── RESULTS ───────────────────────────────────────────────────
-function renderResults() {
-  var el = document.getElementById('results-content');
-  if (!el) return;
-  var lg = PRIMARY && PRIMARY.latestGame;
-  if (!lg) { el.innerHTML = '<div class="no-data">No game data available.</div>'; return; }
-
-  var html = '';
-
-  // Header stats
-  html += '<div class="results-header">' +
-    '<div class="rh-stat"><div class="rh-label">Date</div><div class="rh-val" style="font-size:14px;">' + fmtDate(lg.date) + '</div></div>' +
-    '<div class="rh-stat"><div class="rh-label">Game</div><div class="rh-val" style="font-size:14px;">' + esc(lg.gameLabel) + '</div></div>' +
-    '<div class="rh-stat"><div class="rh-label">Players</div><div class="rh-val">' + lg.numPlayers + '</div></div>' +
-    '<div class="rh-stat"><div class="rh-label">ITM</div><div class="rh-val">' + lg.itmCount + '</div></div>' +
-    '<div class="rh-stat"><div class="rh-label">Prize Pool</div><div class="rh-val" style="font-size:14px;">' + fmtChips(lg.totalChips + lg.totalBounty) + '</div></div>' +
-  '</div>';
-
-  // Podium
-  html += '<div class="podium-wrap" id="res-podium-inner"></div>';
-
-  // Table
-  var hasBounty = lg.hasBounty;
-  html += '<div class="card"><div class="tbl-wrap"><table><thead><tr>' +
-    '<th>Rank</th><th style="text-align:left;">Player</th><th>Points</th><th>Chips Won</th>' +
-    (hasBounty ? '<th>Bounty</th><th>Total</th>' : '') +
-  '</tr></thead><tbody>';
-
-  lg.players.forEach(function(p) {
-    var rc = p.rank===1?'rank-1':p.rank===2?'rank-2':p.rank===3?'rank-3':'rank-other';
-    var total = p.chips + (hasBounty ? p.bounty : 0);
-    var chipCls = p.chips > 0 ? 'td-chips-pos' : 'td-zero';
-    html += '<tr>' +
-      '<td class="td-rank ' + rc + '">' + p.rank + '</td>' +
-      '<td class="td-player">' + esc(p.player) + '</td>' +
-      '<td class="td-pts">' + fmtNum(p.points) + '</td>' +
-      '<td class="' + chipCls + '">' + (p.chips > 0 ? fmtChips(p.chips) : '—') + '</td>' +
-      (hasBounty ? '<td class="td-pts">' + (p.bounty>0?fmtChips(p.bounty):'—') + '</td><td class="td-pts">' + (total>0?fmtChips(total):'—') + '</td>' : '') +
-    '</tr>';
-  });
-
-  html += '</tbody></table></div></div>';
-  el.innerHTML = html;
-
-  // Render podium
-  var podEl = document.getElementById('res-podium-inner');
-  if (podEl) renderPodium('res-podium-inner', lg.players.map(function(p){
-    return {rank:p.rank, player:p.player, total:p.points};
-  }), lg.gameLabel);
-}
-
-// ── CALENDAR ──────────────────────────────────────────────────
-function setCalTZ(tz, el) {
-  STATE.calTZ = tz;
-  document.querySelectorAll('[data-tz]').forEach(function(e){ e.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderCalendar();
-}
-
-function setCalFilter(f, el) {
-  STATE.calFilter = f;
-  document.querySelectorAll('[data-cf]').forEach(function(e){ e.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderCalendar();
-}
-
-function renderCalendar() {
-  var el = document.getElementById('cal-grid');
-  if (!el) return;
-  var tList = TOURNAMENTS || (PRIMARY && PRIMARY.tournaments) || [];
-  if (!tList.length) {
-    el.innerHTML = tournsLoading
-      ? '<div class="cal-empty">Loading tournament calendar…</div>'
-      : '<div class="cal-empty">No upcoming tournaments found.</div>';
-    return;
-  }
-
-  var tourn = tList.slice();
-
-  // Filter by status
-  if (STATE.calFilter !== 'all') {
-    tourn = tourn.filter(function(t) {
-      var s = (t.status||'').toLowerCase();
-      if (STATE.calFilter === 'running')  return s.indexOf('running') >= 0;
-      if (STATE.calFilter === 'complete') return s.indexOf('complet') >= 0;
-      if (STATE.calFilter === 'upcoming') return s.indexOf('running') < 0 && s.indexOf('complet') < 0;
+      // Retrieve current standings so can calculate movement
+      var cs = SpreadsheetApp.getActiveSpreadsheet();
+ 
+      processResults(json);
+      storeElapsedTime(json.gameinfo.row, json.start, json.end);
+      generateTournamentReport(json.id, json);
+      buildAllSheets();
+      try { whWABustCache(); } catch(e) { Logger.log('whWABustCache: ' + e.message); }
+      Logger.log("Completed Processing: " + JSON.stringify(gameinfo));
       return true;
-    });
-  }
-
-  if (!tourn.length) { el.innerHTML = '<div class="cal-empty">No tournaments match this filter.</div>'; return; }
-
-  // Group by date in selected TZ
-  var groups = {};
-  var groupOrder = [];
-  tourn.forEach(function(t) {
-    var dt  = new Date(t.start);
-    var dayKey = dt.toLocaleDateString('en-US', {timeZone:STATE.calTZ, year:'numeric', month:'2-digit', day:'2-digit'});
-    if (!groups[dayKey]) { groups[dayKey] = []; groupOrder.push(dayKey); }
-    groups[dayKey].push(t);
-  });
-
-  var html = '';
-  groupOrder.forEach(function(dk) {
-    var evts = groups[dk];
-    var dayLabel = (new Date(evts[0].start)).toLocaleDateString('en-US',{timeZone:STATE.calTZ,weekday:'long',month:'long',day:'numeric',year:'numeric'});
-    html += '<div class="cal-day">' +
-      '<div class="cal-day-hdr">' +
-        '<span class="cal-day-date">' + dayLabel + '</span>' +
-        '<span class="cal-day-count">' + evts.length + (evts.length===1?' game':' games') + '</span>' +
-      '</div>';
-
-    evts.forEach(function(t) {
-      var dt = new Date(t.start);
-      var timeStr = dt.toLocaleTimeString('en-US',{timeZone:STATE.calTZ,hour:'2-digit',minute:'2-digit',hour12:true});
-      var status = t.status || 'Announced';
-      var sCls = status.toLowerCase().indexOf('running')>=0 ? 'status-running'
-               : status.toLowerCase().indexOf('complet')>=0 ? 'status-complete'
-               : 'status-announced';
-      var chips = t.chips ? fmtChips(t.chips) : '';
-      var gameStr = t.game ? (' · ' + t.game) : '';
-      html += '<div class="cal-event">' +
-        '<div class="cal-time">' + timeStr + '</div>' +
-        '<div class="cal-body">' +
-          '<div class="cal-name">' +
-            (t.link ? '<a href="' + esc(t.link) + '" target="_blank" rel="noopener">' + esc(t.name) + '</a>' : esc(t.name)) +
-          '</div>' +
-          '<div class="cal-meta">League: ' + esc(t.league) + gameStr + (chips?' · '+chips:'') + '</div>' +
-        '</div>' +
-        '<div class="cal-status ' + sCls + '">' + esc(status) + '</div>' +
-      '</div>';
-    });
-
-    html += '</div>';
-  });
-
-  el.innerHTML = html;
-}
-
-// ── ALL-TIME ──────────────────────────────────────────────────
-var AT_DATA       = null;
-var atLoading     = false;
-var AT_STATE      = { cat:'points', sort:{col:'rank', asc:true} };
-
-function ensureAllTime(cb) {
-  if (AT_DATA) { cb(); return; }
-  if (atLoading) { setTimeout(function(){ ensureAllTime(cb); }, 200); return; }
-  atLoading = true;
-  google.script.run
-    .withSuccessHandler(function(j){
-      if (j && j.quarters) AT_DATA = j;
-      atLoading = false;
-      cb();
-    })
-    .withFailureHandler(function(){ atLoading = false; cb(); })
-    .whWAGetAllTimeForClient();
-}
-
-function setAtCat(cat, el) {
-  AT_STATE.cat  = cat;
-  AT_STATE.sort = {col:'rank', asc:true};
-  document.querySelectorAll('.at-cat-btn').forEach(function(b){ b.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderAtTable();
-}
-
-function renderAtTable() {
-  if (!AT_DATA) {
-    document.getElementById('at-tbody').innerHTML =
-      '<tr><td colspan="20"><div class="sec-spinner">Loading all-time data…</div></td></tr>';
-    ensureAllTime(renderAtTable);
-    return;
-  }
-  var cat = AT_STATE.cat;
-  if (cat === 'roi') { renderAtRoi(); return; }
-
-  var qls  = AT_DATA.quarters || [];
-  var rows = AT_DATA[cat] || [];
-
-  // Build headers
-  var thead = document.getElementById('at-thead-row');
-  var cols  = ['rank','player'].concat(qls).concat(['total']);
-  var labels= {rank:'Rank', player:'Player', total:'Total'};
-  qls.forEach(function(q){ labels[q] = q; });
-  thead.innerHTML = '';
-  cols.forEach(function(c) {
-    var th = document.createElement('th');
-    th.textContent = labels[c] || c;
-    th.className   = c === 'total' ? 'at-total-col' : c === 'rank' ? '' : (qls.indexOf(c) >= 0 ? 'at-q-col' : '');
-    th.onclick = (function(col){ return function(){ sortAtTable(col); }; })(c);
-    if (c === AT_STATE.sort.col) th.className += ' ' + (AT_STATE.sort.asc ? 'sort-asc' : 'sort-desc');
-    thead.appendChild(th);
-  });
-
-  // Sort rows
-  var sorted = rows.slice().sort(function(a,b){
-    var col = AT_STATE.sort.col, asc = AT_STATE.sort.asc;
-    var va = a[col] !== undefined ? a[col] : 0;
-    var vb = b[col] !== undefined ? b[col] : 0;
-    if (col === 'player') { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
-    if (va < vb) return asc ? -1 : 1;
-    if (va > vb) return asc ?  1 : -1;
-    return 0;
-  });
-
-  var isChips = (cat === 'chips');
-  var html = '';
-  sorted.forEach(function(r) {
-    var rc = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
-    html += '<tr><td class="td-rank ' + rc + '">' + r.rank + '</td>' +
-            '<td class="td-player">' + esc(r.player) + '</td>';
-    qls.forEach(function(ql) {
-      var v = r[ql] || 0;
-      var cls = v === 0 ? ' at-zero' : '';
-      html += '<td class="at-q-col' + cls + '">' + (v === 0 ? '—' : (isChips ? fmtChips(v) : fmtNum(v))) + '</td>';
-    });
-    var t = r.total || 0;
-    html += '<td class="at-total-col">' + (isChips ? fmtChips(t) : fmtNum(t)) + '</td></tr>';
-  });
-  document.getElementById('at-tbody').innerHTML = html ||
-    '<tr><td colspan="' + cols.length + '" class="no-data">No data</td></tr>';
-}
-
-function renderAtRoi() {
-  var rows = AT_DATA ? (AT_DATA.roi || []) : [];
-  var cols = ['rank','player','games','invested','chips','net','roi'];
-  var labels = {rank:'Rank',player:'Player',games:'Games',invested:'Invested',chips:'Chips Won',net:'Net',roi:'ROI%'};
-
-  var thead = document.getElementById('at-thead-row');
-  thead.innerHTML = '';
-  cols.forEach(function(c) {
-    var th = document.createElement('th');
-    th.textContent = labels[c];
-    th.onclick = (function(col){ return function(){ sortAtTable(col); }; })(c);
-    if (c === AT_STATE.sort.col) th.className = AT_STATE.sort.asc ? 'sort-asc' : 'sort-desc';
-    thead.appendChild(th);
-  });
-
-  var sorted = rows.slice().sort(function(a,b){
-    var col = AT_STATE.sort.col, asc = AT_STATE.sort.asc;
-    var va = a[col] !== undefined ? a[col] : 0;
-    var vb = b[col] !== undefined ? b[col] : 0;
-    if (col === 'player') { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
-    if (va < vb) return asc ? -1 : 1;
-    if (va > vb) return asc ?  1 : -1;
-    return 0;
-  });
-
-  var html = '';
-  sorted.forEach(function(r) {
-    var rc  = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
-    var nCls = r.net >= 0 ? 'at-pos' : 'at-neg';
-    var rCls = r.roi >= 0 ? 'at-pos' : 'at-neg';
-    html += '<tr>' +
-      '<td class="td-rank ' + rc + '">' + r.rank + '</td>' +
-      '<td class="td-player">' + esc(r.player) + '</td>' +
-      '<td>' + r.games + '</td>' +
-      '<td>' + fmtChips(r.invested) + '</td>' +
-      '<td>' + fmtChips(r.chips)    + '</td>' +
-      '<td class="' + nCls + '">' + (r.net>=0?'+':'') + fmtChips(r.net) + '</td>' +
-      '<td class="' + rCls + ' td-total">' + (r.roi>=0?'+':'') + r.roi + '%</td>' +
-    '</tr>';
-  });
-  document.getElementById('at-tbody').innerHTML = html ||
-    '<tr><td colspan="7" class="no-data">No data</td></tr>';
-}
-
-function sortAtTable(col) {
-  if (AT_STATE.sort.col === col) AT_STATE.sort.asc = !AT_STATE.sort.asc;
-  else { AT_STATE.sort.col = col; AT_STATE.sort.asc = (col === 'rank' || col === 'player'); }
-  renderAtTable();
-}
-
-// ── LEADERS TAB ───────────────────────────────────────────────
-function onLeadersTabOpen() {
-  ensureStats(function() {
-    var sel = document.getElementById('ld-period-sel');
-    if (sel && STATS_DATA) {
-      var periods = Object.keys(STATS_DATA).sort(function(a,b){
-        if (a==='Overall') return -1; if (b==='Overall') return 1;
-        return b.localeCompare(a);
-      });
-      sel.innerHTML = '';
-      periods.forEach(function(p){
-        var o=document.createElement('option');
-        o.value=p; o.textContent=p; sel.appendChild(o);
-      });
-      if (STATE.quarter && STATS_DATA[STATE.quarter]) sel.value = STATE.quarter;
+    } else {
+      // Can't process yet
+      return false;
     }
-    renderLeaders();
-  });
 }
 
-function renderLeaders() {
-  var el = document.getElementById('leaders-content');
-  if (!el) return;
-  if (!STATS_DATA) { el.innerHTML = '<div class="sec-spinner">Loading stats…</div>'; return; }
+function getElapsedTime(start, end){
+  var timeDiff = ((new Date(end)) - (new Date(start)));
+  return new Date(timeDiff).toISOString().slice(11,19)   // HH:MM:SS
+}
 
-  var sel = document.getElementById('ld-period-sel');
-  var period = sel ? sel.value : 'Overall';
-  var rows = STATS_DATA[period] || [];
+function storeElapsedTime(row, start, end) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var srcsheet = ss.getSheetByName("Schedule");
+  const colndx = srcsheet.getRange("A1:1").getValues()[0].indexOf("ELAPSED TIME") ;
+  srcsheet.getRange(row, colndx + 1).setValue(getElapsedTime(start, end));
+}
 
-  if (!rows.length) { el.innerHTML = '<div class="no-data">No stats for this period.</div>'; return; }
+function processResults(json) {
+    let ss = SpreadsheetApp.getActiveSpreadsheet();
+    //let sched = ss.getSheetByName("Schedule");
+    //let bountyamt = sched.getRange("K1").getValue();
+    let bountyamt = json.prizes ? json.prizes.bounty : null;
+  // extract data for each player, calculate points 
+  var gameresults = [];
 
-  // Summary cards
-  // totalEntries = sum of each player's game count (counts every seat in every game)
-  // totalGames   = sum of all wins = number of unique tournaments (each game has exactly 1 winner)
-  var totalEntries = rows.reduce(function(s,r){return s+r.t_games;},0);
-  var totalGames   = rows.reduce(function(s,r){return s+r.t_wins;},0);
-  var uniqueP      = rows.length;
+  var bounty_winners = json.bounty_winners || [];
+  var winners = json.winners;
+  var numplayers = winners.length;
+  for (var i = 0; i < numplayers; i++) {
+    var obj = winners[i];
+    var position = i+1;
+    var player = obj.username;
+        
+    var chips = "";
+    if (obj.prizes.length > 0) {
+      chips = obj.prizes[0].replace(/\s*chips/,"");  // just need the number
+    }
 
-  var html = '<div class="stat-grid">' +
-    scCard('Players', uniqueP, '') +
-    scCard('Tournaments', totalGames, '') +
-    scCard('Total Entries', totalEntries, '') +
-    scCard('Avg Win Rate', pct(totalEntries ? totalGames/totalEntries : 0), '') +
-  '</div>';
-
-  // Sort all players
-  var sorted = rows.slice().sort(function(a, b) {
-    var c = LD_SORT.col, asc = LD_SORT.asc;
-    var va, vb;
-    if      (c === 'player') { va = a.player.toLowerCase(); vb = b.player.toLowerCase(); }
-    else if (c === 'wins')   { va = a.t_wins;    vb = b.t_wins;    }
-    else if (c === 'games')  { va = a.t_games;   vb = b.t_games;   }
-    else if (c === 'winpct') { va = a.t_winpct||0; vb = b.t_winpct||0; }
-    else if (c === 'chips')  { va = a.t_chips;   vb = b.t_chips;   }
-    else if (c === 'roi')    { va = a.t_roi;     vb = b.t_roi;     }
-    else if (c === 'itmpct') { va = a.t_itmpct||0; vb = b.t_itmpct||0; }
-    else                     { va = a.t_points;  vb = b.t_points;  }
-    if (typeof va === 'string') return asc ? va.localeCompare(vb) : vb.localeCompare(va);
-    return asc ? va - vb : vb - va;
-  });
-
-  function ldTh(col, label, extraStyle) {
-    var cls = (LD_SORT.col === col) ? (LD_SORT.asc ? 'sort-asc' : 'sort-desc') : '';
-    return '<th' + (extraStyle ? ' style="' + extraStyle + '"' : '') +
-      ' class="' + cls + '" onclick="sortLeaders(\'' + col + '\')">' + label + '</th>';
+    // calculate the points
+    var points = Math.ceil(((1000*(Math.sqrt(numplayers)/Math.sqrt(position)))*(1 + Math.log10(json.buyIns.chips))));
+    
+    // Get bounties
+    let bountychips = "";
+    let numbounties = "";
+    const result = bounty_winners.find(({ username }) => username === player);
+    if (result) {
+      bountychips = result.prizes[0].replace(/[^0-9]/g, "");
+    }
+    let url = json.gameinfo.url;
+    var buyins     = json.buyIns ? json.buyIns.chips : 20000;
+    var combinedDT = combineDateAndTime_(json.gameinfo.dateplayed, json.gameinfo.timeplayed);
+    gameresults.push([combinedDT, json.gameinfo.game, numplayers, position, player, points, chips, bountychips, url, buyins]);
   }
 
-  html += '<div class="card"><div class="tbl-wrap"><table><thead><tr>' +
-    '<th>Rank</th>' +
-    ldTh('player', 'Player', 'text-align:left') +
-    ldTh('points', 'Points') +
-    ldTh('wins',   'Wins') +
-    ldTh('games',  'Games') +
-    ldTh('winpct', 'Win%') +
-    ldTh('chips',  'Chips') +
-    ldTh('roi',    'ROI') +
-    ldTh('itmpct', 'ITM%') +
-  '</tr></thead><tbody>';
-
-  sorted.forEach(function(r, i) {
-    var rank = i + 1;
-    var rc = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-other';
-    var roiSign = r.t_roi >= 0 ? '+' : '';
-    html += '<tr>' +
-      '<td class="td-rank ' + rc + '">' + rank + '</td>' +
-      '<td class="td-player">' + esc(r.player) + '</td>' +
-      '<td>' + fmtNum(r.t_points) + '</td>' +
-      '<td>' + r.t_wins + '</td>' +
-      '<td>' + r.t_games + '</td>' +
-      '<td>' + pct(r.t_winpct) + '</td>' +
-      '<td>' + fmtChips(r.t_chips) + '</td>' +
-      '<td class="' + (r.t_roi >= 0 ? 'at-pos' : 'at-neg') + '">' + roiSign + fmtChips(r.t_roi) + '</td>' +
-      '<td>' + pct(r.t_itmpct) + '</td>' +
-    '</tr>';
-  });
-
-  html += '</tbody></table></div></div>';
-  el.innerHTML = html;
+  // post the game results
+  var sheet = ss.getSheetByName("GameResults");
+  sheet.insertRowsBefore(3, gameresults.length).getRange(3, 1, gameresults.length, 10).setValues(gameresults);
 }
 
-function sortLeaders(col) {
-  if (LD_SORT.col === col) LD_SORT.asc = !LD_SORT.asc;
-  else { LD_SORT.col = col; LD_SORT.asc = (col === 'player'); }
-  renderLeaders();
-}
+function rerunAll() {
+  if (showAlert("Clear all tournament Data and Reload all Tournaments?\n\n")) {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("GameResults"); 
+    sheet.getRange("A2:H").clearContent();
+    var sched = ss.getSheetByName("Schedule");
+    var nextprocessed = sched.getRange("H1").getValue();
+    sched.getRange("D2:D").clearContent();
 
-// ── ALL-TIME TAB ──────────────────────────────────────────────
-function onAlltimeTabOpen() {
-  ensureAllTime(renderAtTable);
-}
-
-function scCard(label, val, sub) {
-  return '<div class="stat-card"><div class="sc-label">' + label + '</div>' +
-    '<div class="sc-val">' + val + '</div>' +
-    (sub ? '<div class="sc-name">' + sub + '</div>' : '') + '</div>';
-}
-
-// ── PLAYER REPORT ─────────────────────────────────────────────
-function onPrTabOpen() {
-  ensurePrPlayers(function() {
-    if (!PR_PLAYERS) return;
-    var qSel = document.getElementById('pr-quarter-sel');
-    var qls  = PR_PLAYERS.quarters || [];
-    if (qSel && qSel.options.length === 0) {
-      qSel.innerHTML = '';
-      qls.forEach(function(q){
-        var o=document.createElement('option'); o.value=q; o.textContent=q; qSel.appendChild(o);
-      });
-      if (STATE.quarter && qls.indexOf(STATE.quarter) >= 0) qSel.value = STATE.quarter;
+    let games = ["omaha", "stud7HiLo", "holdem", "royal", "stud7", "omaha_hi_lo", "Leaderboard"];
+    for (let game of games) {
+      var sheet = ss.getSheetByName(game);
+      sheet.getRange("C3:E").clearContent();
     }
-    onPrQuarterChange();
-  });
+
+    for(var i = 2; i < nextprocessed; i++) {
+      getTournamentData(getGameInfo(i));
+    }
+  }
 }
 
-function onPrQuarterChange() {
-  if (!PR_PLAYERS) return;
-  var qSel = document.getElementById('pr-quarter-sel');
-  var pSel = document.getElementById('pr-player-sel');
-  if (!qSel || !pSel) return;
-  var q = qSel.value;
-  var players = (PR_PLAYERS.players && PR_PLAYERS.players[q]) || [];
-  pSel.innerHTML = '<option value="">— Select Player —</option>';
-  players.forEach(function(p){
-    var o=document.createElement('option'); o.value=p; o.textContent=p; pSel.appendChild(o);
-  });
-  document.getElementById('pr-report-area').innerHTML = '';
+function processThese() {
+     for(var i = 3; i < 74; i++) {
+      getTournamentData(getGameInfo(i));
+    } 
 }
 
-function runPlayerReport() {
-  var qSel = document.getElementById('pr-quarter-sel');
-  var pSel = document.getElementById('pr-player-sel');
-  var el   = document.getElementById('pr-report-area');
-  if (!qSel || !pSel || !el) return;
-  var quarter = qSel.value, player = pSel.value;
-  if (!quarter || !player) { el.innerHTML = '<div class="no-data">Select a quarter and player.</div>'; return; }
-  el.innerHTML = '<div class="sec-spinner">Loading player data…</div>';
 
-  ensureQRows(quarter, function(data) {
-    var rows = (data.rows && data.rows[player]) || [];
-    if (!rows.length) { el.innerHTML = '<div class="no-data">No results for ' + esc(player) + ' in ' + esc(quarter) + '.</div>'; return; }
-    renderPrReport(player, quarter, rows, el);
-  });
+function clearAllData() {
+  if (showAlert("THIS WILL DELETE ALL DATA IN THE SPREADSHEET!\n\nDID YOU MAKE A COPY OF THE SPREADSHEET?\n\n")) {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("GameResults"); 
+    sheet.deleteRows(3, sheet.getLastRow() - 2);
+  
+    sheet = ss.getSheetByName("Schedule"); 
+    sheet.deleteRows(2, sheet.getLastRow() - 1)  
+    let games = ["omaha", "stud7HiLo", "holdem", "royal", "stud7", "omaha_hi_lo", "Leaderboard"];
+    for (let game of games) {
+      var sheet = ss.getSheetByName(game);
+      sheet.getRange("C3:E").clearContent();
+    }
+  }
 }
 
-function renderPrReport(player, quarter, rows, el) {
-  // Best-4 per game type
-  var byGame = {};
-  GAME_KEYS.forEach(function(gk){ byGame[gk]=[]; });
-  rows.forEach(function(r){ if(byGame[r.game]) byGame[r.game].push(r); });
+function resetScheduleData() {
+  if (showAlert("Reset Schedule Data\n\n")) {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Schedule"); 
+    sheet.getDataRange("D2:D").clearContent(); 
+  }
+}
+/*
+function showAlert(msg) {
+  var ui;
+  try {
+   ui = SpreadsheetApp.getUi(); // Same variations.
+  } catch (error) {
+    Logger.log(JSON.stringify(error));
+    if (error.message.match("from this context")) {
+      return(1);
+    }
+    return 0;
+  }
 
-  var gameTotal = 0;
-  GAME_KEYS.forEach(function(gk){
-    var best4 = byGame[gk].slice().sort(function(a,b){return b.points-a.points;}).slice(0,4);
-    best4.forEach(function(r){ gameTotal += r.points; });
+  var result = ui.alert(
+     'Please confirm',
+     msg +
+     'Are you sure you want to continue?',
+      ui.ButtonSet.YES_NO);
+
+  // Process the user's response.
+  if (result == ui.Button.YES) {
+    return(1);
+  } else {
+    return(0);
+  }
+}
+*/
+
+function showAlert(message) {
+  var html = HtmlService.createHtmlOutput(
+      '<div style="font-family:Arial; font-size:14px; padding:8px;">' +
+      message.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') +
+      '</div><div style="text-align:right; padding:8px;"><button onclick="google.script.host.close()">OK</button></div>'
+    )
+    .setWidth(420)
+    .setHeight(260);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Message');
+}
+
+function getGameInfo(rownum) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Schedule");
+
+  // get the next row to process from G1 if not passed in
+  if (["", null, undefined].includes(rownum) ) {
+    const colndx = sheet.getRange("A1:1").getValues()[0].indexOf("PROCESS NEXT") + 1;
+    
+    rownum = sheet.getRange(2,colndx).getValue();
+  }
+
+  var range = "A"+rownum+":E"+rownum;
+
+  var gamedata = sheet.getRange(range).getValues();
+  if ([null, undefined].includes(gamedata) ) {
+    //deleteIntervalTriggers();   // uncomment if use time triggers
+    throw new Error("No game info to process at Schedule row #"+rownum);
+  }
+
+  // get column index for max_for_LB
+  const mflb = sheet.getRange("A1:1").getValues()[0].indexOf("Games for LB") + 1;
+  let max_for_LB = sheet.getRange(2, mflb).getValue();
+ 
+  var gameinfo = {
+    "dateplayed" : gamedata[0][0], 
+    "timeplayed" : gamedata[0][1],
+    "url" : "https://www.casino.org/replaypoker/api/v2/tournaments/" + gamedata[0][2],
+    "game" : gamedata[0][3],
+    "name" : gamedata[0][4],
+    "row" : rownum,
+    "max_for_LB": max_for_LB
+  };
+  const date = gamedata[0][0];
+  const time = gamedata[0][1];
+  const timezone = Session.getScriptTimeZone();
+
+  if (date && time) {
+    const combined = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      time.getHours(),
+      time.getMinutes()
+    );
+    var formatted = Utilities.formatDate(combined, timezone, "yyyy-MM-dd HH:mm");
+  }
+
+  gameinfo["processmsg"] = "Process Tournament: " + gamedata[0][2] +
+                           "\n\nGame: " + gamedata[0][3] + 
+                           "\n\nName: " + gamedata[0][4] + 
+                           "\n\nDate: " + formatted + "\n\n";
+  return gameinfo;
+}
+
+function getNewTournamentIDs () {
+  const url = "https://www.casino.org/replaypoker/api/v2/leagues/58";
+  var options = {
+    headers: { 'Cookie': ReplayPokerLogin.getSessionCookies(), 'Accept': 'application/json' },
+    'muteHttpExceptions' : true
+  };
+  var content = JSON.parse(UrlFetchApp.fetch(url, options).getContentText());
+  Logger.log(content);
+  var tournaments = content.league.tournaments;
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Schedule");
+  const lastrow = sheet.getLastRow();
+  var lastdate = sheet.getRange("A"+lastrow).getValue();
+  const timeStr = sheet.getRange("B" + lastrow).getValue(); // Assuming time is in B2 like "19:00"
+
+  // If it's stored as a string like "19:00"
+  //const [hours, minutes] = timeStr.toString().split(":").map(Number);
+
+  // Or if the cell is formatted as time and returns a Date object
+  // const time = new Date(timeStr);
+   const hours = timeStr.getHours();
+   const minutes = timeStr.getMinutes();
+
+  lastdate.setHours(hours, minutes, 0, 0); // set to HH:mm from schedule
+
+
+  var arr2 = [];
+  for (var i = 0; i < tournaments.length; i++){
+    let el = tournaments[i];
+    const tdate = el.start.substring(0,10);
+    const gametime = el.start.substring(11,16);
+    const timezone = Session.getScriptTimeZone(); // or specify like "America/New_York"
+  
+    const dt = new Date(el.start.substring(0,16).replace("T", " "));
+    console.log(`lastdate: ${lastdate}, tdate: ${dt}`);
+    if (dt <= lastdate) {continue;}
+    const game = el.game ? (el.game.variation || el.game.name) : '';
+    const name = el.name;
+    const tid = el.id;
+    // const url = urlbase + el.url;  // el.url not reliably present in v2
+    if (["announced", "registering"].includes(el.state) &&
+      (dt instanceof Date && !isNaN(dt.getTime())|| dt > lastdate)) {
+      arr2.push([tdate, gametime, tid, game, name]);
+    }
+  }
+  arr2.sort();
+  Logger.log(arr2);
+
+  if (arr2.length) {
+    sheet.getRange("A"+(lastrow+1)+":E"+(lastrow+arr2.length)).setValues(arr2);
+  }
+}
+
+function generatePlayerGameTypeSummariesByTime() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("GameResults");
+  const data = sheet.getRange(3, 1, sheet.getLastRow() - 2, 10).getValues();
+
+  const tz = ss.getSpreadsheetTimeZone();
+
+  const gameTypeMap = {
+    "omaha": "Omaha",
+    "stud7hilo": "Stud7 Hi/Lo",
+    "holdem": "Holdem",
+    "royal": "Royal",
+    "stud7": "Stud7",
+    "omaha_hi_lo": "Omaha Hi/Lo"
+  };
+
+  const headers = ["Omaha", "Stud7 Hi/Lo", "Holdem", "Royal", "Stud7", "Omaha Hi/Lo"];
+  const times = ["ALL", "10:00", "19:00"];
+
+  // Structure: scores[type][time][player][gameType] = [scores]
+  const scores = { Points: {}, Bounties: {} };
+
+  times.forEach(time => {
+    scores.Points[time] = {};
+    scores.Bounties[time] = {};
   });
 
-  var amGames=0, pmGames=0, wins=0, itm=0, chips=0;
-  rows.forEach(function(r){ if(r.slot==='AM') amGames++; else pmGames++; if(r.rank===1)wins++; if(r.chips>0)itm++; chips+=r.chips; });
+  data.forEach(row => {
+    const [rawDateTime, rawGameType,, , player, points, , bountyChips] = row;
+    if (!player || !rawGameType || rawDateTime === "") return;
 
-  var html = '<div class="pr-report-area">' +
-    '<div class="pr-summary">' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">Player</div><div class="pr-sum-val" style="font-size:16px;">' + esc(player) + '</div></div>' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">Quarter</div><div class="pr-sum-val" style="font-size:14px;">' + esc(quarter) + '</div></div>' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">Total Points</div><div class="pr-sum-val">' + fmtNum(gameTotal) + '</div></div>' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">Games</div><div class="pr-sum-val" style="font-size:13px;">' + amGames + ' AM / ' + pmGames + ' PM</div></div>' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">Wins</div><div class="pr-sum-val">' + wins + '</div></div>' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">ITM</div><div class="pr-sum-val">' + itm + '</div></div>' +
-      '<div class="pr-sum-block"><div class="pr-sum-label">Chips Won</div><div class="pr-sum-val" style="font-size:14px;">' + fmtChips(chips) + '</div></div>' +
-    '</div>' +
-    '<div class="pr-best-4-note">★ Highlighted rows count toward Best-4 per game type (top 4 scores per game type are summed for the Total Points above)</div>' +
-    '<div class="tbl-wrap"><table><thead><tr>' +
-      '<th>Date</th><th>Game</th><th>Slot</th><th>Rank</th><th>#Players</th>' +
-      '<th>Points</th><th>Chips Won</th><th>Bounty</th>' +
-    '</tr></thead><tbody>';
+    const gameType = gameTypeMap[rawGameType.toLowerCase()];
+    if (!gameType) return;
 
-  GAME_KEYS.forEach(function(gk) {
-    var gameRows = byGame[gk];
-    if (!gameRows.length) return;
+    const time = rawDateTime ? Utilities.formatDate(new Date(rawDateTime), tz, "HH:mm") : "";
 
-    var counted = gameRows.slice().sort(function(a,b){return b.points-a.points;}).slice(0,4)
-                    .map(function(r){return r.date+r.slot+r.game+r.points;});
+    const relevantTimes = ["ALL"];
+    if (time === "10:00") relevantTimes.push("10:00");
+    if (time === "19:00") relevantTimes.push("19:00");
 
-    gameRows.forEach(function(r) {
-      var key    = r.date+r.slot+r.game+r.points;
-      var isCnt  = counted.indexOf(key) >= 0;
-      var rc     = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
-      html += '<tr' + (isCnt?' class="pr-counted"':'') + '>' +
-        '<td>' + fmtDate(r.date) + '</td>' +
-        '<td><span class="game-badge gb-' + r.game + '">' + GAME_ABBR[r.game] + '</span></td>' +
-        '<td style="color:var(--text-dim);">' + r.slot + '</td>' +
-        '<td class="td-rank ' + rc + '">' + r.rank + '</td>' +
-        '<td>' + r.np + '</td>' +
-        '<td class="td-pts' + (isCnt?' td-total':'') + '">' + fmtNum(r.points) + (isCnt?' ★':'') + '</td>' +
-        '<td class="' + (r.chips>0?'td-chips-pos':'td-zero') + '">' + (r.chips>0?fmtChips(r.chips):'—') + '</td>' +
-        '<td>' + (r.bounty>0?fmtChips(r.bounty):'—') + '</td>' +
-      '</tr>';
+    relevantTimes.forEach(t => {
+      if (!scores.Points[t][player]) scores.Points[t][player] = {};
+      if (!scores.Points[t][player][gameType]) scores.Points[t][player][gameType] = [];
+      scores.Points[t][player][gameType].push(Number(points) || 0);
+
+      if (!scores.Bounties[t][player]) scores.Bounties[t][player] = {};
+      if (!scores.Bounties[t][player][gameType]) scores.Bounties[t][player][gameType] = [];
+      scores.Bounties[t][player][gameType].push(Number(bountyChips) || 0);
     });
   });
 
-  html += '</tbody></table></div></div>';
-  el.innerHTML = html;
+  writeMultiSectionSummary(ss, "Points Overview", scores.Points, headers);
+  writeMultiSectionSummary(ss, "Bounties Overview", scores.Bounties, headers);
 }
 
-// ── CHAMPIONS ─────────────────────────────────────────────────
-var championsRendered = false;
-function renderChampions() {
-  if (championsRendered) return;
-  championsRendered = true;
-  var el = document.getElementById('champ-plaques');
-  if (!el) return;
+function writeMultiSectionSummary(ss, sheetName, dataByTime, gameHeaders) {
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) sheet = ss.insertSheet(sheetName);
+  else sheet.clear();
 
-  // Group by year
-  var years = [], byYear = {};
-  CHAMPIONS_DATA.forEach(function(c) {
-    if (!byYear[c.year]) { byYear[c.year] = []; years.push(c.year); }
-    byYear[c.year].push(c);
-  });
+  const sectionHeaders = ["Rank", "Player", ...gameHeaders, "Grand Total"];
+  let col = 1;
 
-  var html = '';
-  years.forEach(function(yr) {
-    html += '<div class="plaque-year-group">' +
-              '<div class="plaque-year-label">— ' + yr + ' —</div>' +
-              '<div class="plaque-row">';
-    byYear[yr].forEach(function(c) {
-      var sameWinner = c.points === c.bounties;
-      html += '<div class="plaque">' +
-                '<div class="plaque-period">' + esc(c.period) + '</div>';
-      if (sameWinner) {
-        html += '<div class="plaque-row-item"><span class="plaque-label">Points:</span><span class="plaque-val">' + esc(c.points) + '</span></div>' +
-                '<div class="plaque-same-note">Bounties: same</div>';
-      } else {
-        html += '<div class="plaque-row-item"><span class="plaque-label">Points:</span><span class="plaque-val">' + esc(c.points) + '</span></div>' +
-                '<div class="plaque-row-item"><span class="plaque-label">Bounties:</span><span class="plaque-val">' + esc(c.bounties) + '</span></div>';
+  const timeLabels = {
+    "ALL": "ALL TIMES",
+    "10:00": "10 AM",
+    "19:00": "7 PM"
+  };
+
+  for (const timeKey of ["10:00", "19:00", "ALL"]) {
+    let row = 1;
+
+    const dataMap = dataByTime[timeKey];
+    const output = [];
+
+    for (const player in dataMap) {
+      const rowData = [player];
+      let grandTotal = 0;
+      for (const game of gameHeaders) {
+        const scores = (dataMap[player][game] || []).sort((a, b) => b - a).slice(0, 4);
+        const total = scores.reduce((sum, s) => sum + s, 0);
+        rowData.push(total);
+        grandTotal += total;
       }
-      html += '</div>';
+      rowData.push(grandTotal);
+      output.push(rowData);
+    }
+
+    // Sort by Grand Total descending
+    output.sort((a, b) => b[b.length - 1] - a[b.length - 1]);
+
+    // Add Rank
+    const ranked = output.map((r, i) => [i + 1, ...r]);
+
+    // Section title
+    sheet.getRange(row, col, 1, sectionHeaders.length).mergeAcross().setHorizontalAlignment("center").setFontWeight("bold").setFontSize(12);
+
+    sheet.getRange(row++, col).setValue(sheetName + " " + timeLabels[timeKey] + " Best 4");
+
+    // Headers
+    sheet.getRange(row++, col, 1, sectionHeaders.length).setValues([sectionHeaders]).setFontWeight("bold").setBackground("#5891ad").setFontColor("white").setFontSize(12);
+    
+
+    // Data
+    if (ranked.length > 0) {
+      sheet.getRange(row, col, ranked.length, sectionHeaders.length).setValues(ranked);
+      row += ranked.length + 2;
+    } else {
+      sheet.getRange(row++, col).setValue("No data available.");
+      row += 1;
+    }
+    col += 10;
+  }
+}
+
+function generateCurrentLeadersTable() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const tz = ss.getSpreadsheetTimeZone();
+
+  const gameTypeMap = {
+    "holdem": "NL Holdem",
+    "omaha": "PL Omaha",
+    "omaha_hi_lo": "NL Omaha Hi/Lo",
+    "royal": "NL Royal",
+    "stud7": "FL 7 Card Stud",
+    "stud7hilo": "FL 7 Card Stud Hi/Lo"
+  };
+
+  const gameKeys = Object.keys(gameTypeMap);
+  const gameHeaders = Object.values(gameTypeMap);
+  const timeSlots = ["ALL", "10:00", "19:00"];
+  const timeLabels = {
+    "ALL": "All",
+    "10:00": "10:00 AM",
+    "19:00": "7:00 PM"
+  };
+
+  // Get data from GameResults sheet
+  const sheet = ss.getSheetByName("GameResults");
+  const data = sheet.getRange(3, 1, sheet.getLastRow() - 2, 10).getValues();
+
+  // Structure: { Points|Bounties -> time -> game -> {player: [scores]} }
+  const scores = {
+    Points: { ALL: {}, "10:00": {}, "19:00": {} },
+    Bounties: { ALL: {}, "10:00": {}, "19:00": {} }
+  };
+
+  data.forEach(row => {
+    const [rawDateTime, rawGameType,, , player, points, , bountyChips] = row;
+    if (!player || !rawGameType || rawDateTime === "") return;
+
+    const game = rawGameType.toLowerCase();
+    const mappedGame = gameTypeMap[game];
+    if (!mappedGame) return;
+
+    const time = rawDateTime ? Utilities.formatDate(new Date(rawDateTime), tz, "HH:mm") : "";
+    const relevantSlots = ["ALL"];
+    if (time === "10:00") relevantSlots.push("10:00");
+    if (time === "19:00") relevantSlots.push("19:00");
+
+    relevantSlots.forEach(slot => {
+      if (!scores.Points[slot][mappedGame]) scores.Points[slot][mappedGame] = {};
+      if (!scores.Bounties[slot][mappedGame]) scores.Bounties[slot][mappedGame] = {};
+
+      if (!scores.Points[slot][mappedGame][player]) scores.Points[slot][mappedGame][player] = [];
+      if (!scores.Bounties[slot][mappedGame][player]) scores.Bounties[slot][mappedGame][player] = [];
+
+      scores.Points[slot][mappedGame][player].push(Number(points) || 0);
+      scores.Bounties[slot][mappedGame][player].push(Number(bountyChips) || 0);
     });
-    html += '</div></div>';
   });
 
-  el.innerHTML = html;
-}
+  // Prepare sheet
+  let outputSheet = ss.getSheetByName("Current Leaders");
+  if (!outputSheet) outputSheet = ss.insertSheet("Current Leaders");
+  else outputSheet.clear();
 
-// ── UTILITIES ─────────────────────────────────────────────────
-function fmtNum(n) {
-  if (!n && n !== 0) return '—';
-  return Math.round(n).toLocaleString();
-}
+  const createLeaderTable = (label, scoreData, startRow) => {
+    const headers = ["Game Times", "Overall", ...gameHeaders];
+    const rows = [];
 
-function fmtChips(n) {
-  if (!n && n !== 0) return '—';
-  var v = Math.abs(n);
-  var s = '';
-  if (v >= 1000000) s = (v/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
-  else if (v >= 1000) s = (v/1000).toFixed(1).replace(/\.0$/,'') + 'K';
-  else s = v.toLocaleString();
-  return (n < 0 ? '-' : '') + s;
-}
+    for (const timeSlot of timeSlots) {
+      const row = [timeLabels[timeSlot]];
 
-function pct(v) {
-  if (v === null || v === undefined || isNaN(v)) return '—';
-  return Math.round(v * 100) + '%';
-}
+      // Overall leader = highest total across all games in time slot
+      let overallLeader = "";
+      let overallMax = -1;
+      const playerTotals = {};
 
-function fmtDate(d) {
-  if (!d) return '—';
-  var parts = String(d).split('-');
-  if (parts.length === 3) {
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10) + ', ' + parts[0];
-  }
-  return d;
-}
+      for (const game of gameHeaders) {
+        const playerMap = scoreData[timeSlot][game] || {};
+        let topPlayer = "";
+        let topScore = -1;
 
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        for (const [player, scores] of Object.entries(playerMap)) {
+          const top4 = scores.sort((a, b) => b - a).slice(0, 4);
+          const total = top4.reduce((sum, v) => sum + v, 0);
+          if (total > topScore) {
+            topScore = total;
+            topPlayer = player;
+          }
+
+          if (!playerTotals[player]) playerTotals[player] = 0;
+          playerTotals[player] += total;
+        }
+
+        row.push(topPlayer || "");
+      }
+
+      // Compute overall leader from total scores across games
+      for (const [player, total] of Object.entries(playerTotals)) {
+        if (total > overallMax) {
+          overallMax = total;
+          overallLeader = player;
+        }
+      }
+
+      row.splice(1, 0, overallLeader || "");
+      rows.push(row);
+    }
+
+    // Write label
+    outputSheet.getRange(startRow, 1).setValue(label).setWrapStrategy(SpreadsheetApp.WrapStrategy.OVERFLOW);
+;
+    outputSheet.getRange(startRow + 1, 1, 1, headers.length).setValues([headers]);
+
+    // Write data
+    outputSheet.getRange(startRow + 2, 1, rows.length, headers.length).setValues(rows);
+
+    // Style header
+    const headerRange = outputSheet.getRange(startRow + 1, 1, 1, headers.length);
+    headerRange.setFontWeight("bold").setBackground("#5891ad").setFontColor("white");
+    outputSheet.getRange(startRow, 1).setFontWeight("bold").setFontSize(12);
+
+    return startRow + 2 + rows.length + 2; // next start row
+  };
+
+  let nextRow = 1;
+  nextRow = createLeaderTable("Points Leaders", scores.Points, nextRow);
+  createLeaderTable("Bounties Leaders", scores.Bounties, nextRow);
 }
-</script>
-</body>
-</html>

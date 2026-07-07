@@ -918,6 +918,20 @@ body.light .at-total-col { color: var(--wh) !important; }
   margin-top: 5px;
 }
 
+/* ── GAMES TAB SECTION LABEL ─────────────────────────────── */
+.gb-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 6px 0 4px;
+  color: var(--wh-light);
+}
+.gb-section-label.bty { color: var(--gold-d); }
+body.light .gb-section-label.bty { color: var(--gold); }
+
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media(max-width:680px) {
   .sidebar { display:none; }
@@ -1015,6 +1029,12 @@ body.light .at-total-col { color: var(--wh) !important; }
           </div>
         </div>
 
+        <!-- Mode pills -->
+        <div class="pill-bar" style="margin-bottom:10px;">
+          <span class="pill active" data-lbmode="points"   onclick="setLbMode('points',this)">🏆 Points</span>
+          <span class="pill"        data-lbmode="bounties" onclick="setLbMode('bounties',this)">💰 Bounties</span>
+        </div>
+
         <!-- Slot pills -->
         <div class="pill-bar" style="margin-bottom:16px;">
           <span class="pill active" data-slot="ALL" onclick="setLbSlot('ALL',this)">All Games</span>
@@ -1033,7 +1053,7 @@ body.light .at-total-col { color: var(--wh) !important; }
                 <tr>
                   <th onclick="sortLbTable('rank')">Rank</th>
                   <th onclick="sortLbTable('player')" style="text-align:left;">Player</th>
-                  <th onclick="sortLbTable('total')">Total</th>
+                  <th onclick="sortLbTable('total')" id="lb-total-hdr">Total</th>
                   <th onclick="sortLbTable('holdem')" title="Texas Hold'em">H'em</th>
                   <th onclick="sortLbTable('omaha')" title="Omaha">Omaha</th>
                   <th onclick="sortLbTable('omaha_hi_lo')" title="Omaha Hi/Lo">OH/L</th>
@@ -1075,7 +1095,16 @@ body.light .at-total-col { color: var(--wh) !important; }
           <span class="pill"        data-gslot="PM"  onclick="setGmSlot('PM',this)">7 PM</span>
         </div>
 
-        <div id="gm-podium" class="podium-wrap"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+          <div style="flex:1;min-width:260px;">
+            <div class="gb-section-label">🏆 Points</div>
+            <div id="gm-podium" class="podium-wrap" style="margin-bottom:0;"></div>
+          </div>
+          <div style="flex:1;min-width:260px;">
+            <div class="gb-section-label bty">💰 Bounties</div>
+            <div id="gm-bounty-podium" class="podium-wrap" style="margin-bottom:0;"></div>
+          </div>
+        </div>
 
         <div class="card">
           <div class="tbl-wrap">
@@ -1085,6 +1114,7 @@ body.light .at-total-col { color: var(--wh) !important; }
                   <th onclick="sortGmTable('rank')">Rank</th>
                   <th style="text-align:left;" onclick="sortGmTable('player')">Player</th>
                   <th onclick="sortGmTable('points')">Best-4 Pts</th>
+                  <th onclick="sortGmTable('bounties')">Best-4 Bty</th>
                   <th onclick="sortGmTable('games')">Games</th>
                 </tr>
               </thead>
@@ -1301,6 +1331,7 @@ var STATE = {
   tab:        'leaderboard',
   quarter:    '',
   slot:       'ALL',
+  lbMode:     'points',
   gameKey:    'holdem',
   gameSlot:   'ALL',
   theme:      'dark',
@@ -1505,6 +1536,13 @@ function renderAll() {
 }
 
 // ── LEADERBOARD ───────────────────────────────────────────────
+function setLbMode(mode, el) {
+  STATE.lbMode = mode;
+  document.querySelectorAll('[data-lbmode]').forEach(function(e){ e.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  renderLeaderboard();
+}
+
 function setLbSlot(slot, el) {
   STATE.slot = slot;
   document.querySelectorAll('[data-slot]').forEach(function(e){ e.classList.remove('active'); });
@@ -1514,12 +1552,17 @@ function setLbSlot(slot, el) {
 
 function renderLeaderboard() {
   if (!PRIMARY || !PRIMARY.leaderboard) return;
-  var lb  = PRIMARY.leaderboard;
-  var ql  = document.getElementById('lb-quarter-sel');
-  var q   = ql ? ql.value : STATE.quarter;
-  var rows = (lb.data[q] && lb.data[q][STATE.slot]) || [];
+  var lb    = PRIMARY.leaderboard;
+  var ql    = document.getElementById('lb-quarter-sel');
+  var q     = ql ? ql.value : STATE.quarter;
+  var isBty = STATE.lbMode === 'bounties';
+  var src   = (isBty && lb.bountyData) ? lb.bountyData : lb.data;
+  var rows  = (src[q] && src[q][STATE.slot]) || [];
 
-  renderPodium('lb-podium', rows, 'Overall — ' + GAME_FULL[GAME_KEYS[0]]);
+  var hdr = document.getElementById('lb-total-hdr');
+  if (hdr) hdr.textContent = isBty ? 'Total Bty' : 'Total';
+
+  renderPodium('lb-podium', rows, isBty ? 'Overall Bounties' : 'Overall Points');
   renderLbTable(rows);
 }
 
@@ -1564,6 +1607,8 @@ function renderLbTable(rows) {
   if (!tbody) return;
 
   var sorted = sortLbRows(rows);
+  var isBty  = STATE.lbMode === 'bounties';
+  var fmt    = isBty ? fmtChips : fmtNum;
 
   var html = '';
   sorted.forEach(function(r) {
@@ -1571,10 +1616,10 @@ function renderLbTable(rows) {
     html += '<tr class="lb-row">' +
       '<td class="td-rank ' + rc + '">' + r.rank + '</td>' +
       '<td class="td-player">' + esc(r.player) + '</td>' +
-      '<td class="td-total">' + fmtNum(r.total) + '</td>';
+      '<td class="td-total">' + fmt(r.total) + '</td>';
     GAME_KEYS.forEach(function(gk) {
       var v = r.g ? (r.g[gk] || 0) : 0;
-      html += '<td class="td-pts' + (v===0?' td-zero':'') + '">' + (v===0?'—':fmtNum(v)) + '</td>';
+      html += '<td class="td-pts' + (v===0?' td-zero':'') + '">' + (v===0?'—':fmt(v)) + '</td>';
     });
     html += '</tr>';
   });
@@ -1655,7 +1700,7 @@ function onGamesTabOpen() {
 
 function renderGames() {
   if (!GAME_BOARDS) {
-    document.getElementById('gm-tbody').innerHTML = '<tr><td colspan="4"><div class="sec-spinner">Loading game data…</div></td></tr>';
+    document.getElementById('gm-tbody').innerHTML = '<tr><td colspan="5"><div class="sec-spinner">Loading game data…</div></td></tr>';
     return;
   }
   var gsel = document.getElementById('gm-quarter-sel');
@@ -1663,6 +1708,14 @@ function renderGames() {
   var rows = (GAME_BOARDS[q] && GAME_BOARDS[q][STATE.gameKey] && GAME_BOARDS[q][STATE.gameKey][STATE.gameSlot]) || [];
 
   renderPodium('gm-podium', rows, GAME_FULL[STATE.gameKey]);
+
+  // Bounty podium: re-rank players by best-4 bounty total for this genre/slot
+  var btyRows = rows.slice()
+    .filter(function(r){ return (r.bounties || 0) > 0; })
+    .sort(function(a,b){ return (b.bounties || 0) - (a.bounties || 0); })
+    .map(function(r, i){ return {rank: i+1, player: r.player, total: r.bounties}; });
+  renderPodium('gm-bounty-podium', btyRows, GAME_FULL[STATE.gameKey]);
+
   renderGmTable(rows);
 }
 
@@ -1672,15 +1725,17 @@ function renderGmTable(rows) {
   var sorted = sortGmRows(rows);
   var html = '';
   sorted.forEach(function(r) {
-    var rc = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
+    var rc  = r.rank===1?'rank-1':r.rank===2?'rank-2':r.rank===3?'rank-3':'rank-other';
+    var bty = r.bounties || 0;
     html += '<tr>' +
       '<td class="td-rank ' + rc + '">' + r.rank + '</td>' +
       '<td class="td-player">' + esc(r.player) + '</td>' +
       '<td class="td-total">' + fmtNum(r.points) + '</td>' +
+      '<td class="td-pts' + (bty === 0 ? ' td-zero' : '') + '">' + (bty > 0 ? fmtChips(bty) : '—') + '</td>' +
       '<td class="td-pts">' + r.games + '</td>' +
     '</tr>';
   });
-  tbody.innerHTML = html || '<tr><td colspan="4" class="no-data">No data</td></tr>';
+  tbody.innerHTML = html || '<tr><td colspan="5" class="no-data">No data</td></tr>';
   highlightGmSort();
 }
 
@@ -1709,7 +1764,7 @@ function sortGmTable(col) {
 
 function highlightGmSort() {
   var ths = document.querySelectorAll('#gm-table thead th');
-  var cols = ['rank','player','points','games'];
+  var cols = ['rank','player','points','bounties','games'];
   ths.forEach(function(th,i){
     th.classList.remove('sort-asc','sort-desc');
     if (cols[i]===STATE.gmSort.col) th.classList.add(STATE.gmSort.asc?'sort-asc':'sort-desc');

@@ -1328,17 +1328,18 @@ var prPlayersLoading  = false;
 var tournsLoading     = false;
 
 var STATE = {
-  tab:        'leaderboard',
-  quarter:    '',
-  slot:       'ALL',
-  lbMode:     'points',
-  gameKey:    'holdem',
-  gameSlot:   'ALL',
-  theme:      'dark',
-  calTZ:      'America/New_York',
-  calFilter:  'all',
-  lbSort:     {col:'rank', asc:true},
-  gmSort:     {col:'rank', asc:true}
+  tab:         'leaderboard',
+  quarter:     '',
+  slot:        'ALL',
+  lbMode:      'points',
+  gameKey:     'holdem',
+  gameSlot:    'ALL',
+  resultsSlot: '',   // '' = default to PM (last game); 'AM' or 'PM' = user selection
+  theme:       'dark',
+  calTZ:       'America/New_York',
+  calFilter:   'all',
+  lbSort:      {col:'rank', asc:true},
+  gmSort:      {col:'rank', asc:true}
 };
 var LD_SORT = { col: 'points', asc: false };
 
@@ -1775,14 +1776,56 @@ function highlightGmSort() {
 function renderResults() {
   var el = document.getElementById('results-content');
   if (!el) return;
-  var lg = PRIMARY && PRIMARY.latestGame;
-  if (!lg) { el.innerHTML = '<div class="no-data">No game data available.</div>'; return; }
+  var games = PRIMARY && PRIMARY.latestGames;
+  if (!games || !games.length) {
+    el.innerHTML = '<div class="no-data">No game data available.</div>';
+    return;
+  }
 
+  // Build slot selector buttons when multiple games played that day
+  var html = '';
+  if (games.length > 1) {
+    html += '<div class="pill-bar" style="margin-bottom:16px;">';
+    games.forEach(function(g) {
+      var label    = g.slot === 'AM' ? '10 AM' : '7 PM';
+      var isActive = STATE.resultsSlot ? STATE.resultsSlot === g.slot : g === games[games.length - 1];
+      html += '<span class="pill' + (isActive ? ' active' : '') + '" data-rslot="' + g.slot +
+              '" onclick="setResultsSlot(\'' + g.slot + '\',this)">' + label + '</span>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div id="res-game-body"></div>';
+  el.innerHTML = html;
+
+  // Pick which game to show: user selection → default PM (last in sorted array)
+  var lg = games[games.length - 1];
+  if (STATE.resultsSlot) {
+    var found = games.filter(function(g){ return g.slot === STATE.resultsSlot; })[0];
+    if (found) lg = found;
+  }
+  renderGameResult(lg, document.getElementById('res-game-body'));
+}
+
+function setResultsSlot(slot, el) {
+  STATE.resultsSlot = slot;
+  document.querySelectorAll('[data-rslot]').forEach(function(e){ e.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  var games = PRIMARY && PRIMARY.latestGames;
+  if (!games) return;
+  var lg = games.filter(function(g){ return g.slot === slot; })[0];
+  if (lg) renderGameResult(lg, document.getElementById('res-game-body'));
+}
+
+function renderGameResult(lg, el) {
+  if (!el || !lg) return;
   var html = '';
 
   // Header stats
+  var slotLabel = lg.slot === 'AM' ? '10 AM' : '7 PM';
   html += '<div class="results-header">' +
     '<div class="rh-stat"><div class="rh-label">Date</div><div class="rh-val" style="font-size:14px;">' + fmtDate(lg.date) + '</div></div>' +
+    '<div class="rh-stat"><div class="rh-label">Time</div><div class="rh-val" style="font-size:14px;">' + slotLabel + '</div></div>' +
     '<div class="rh-stat"><div class="rh-label">Game</div><div class="rh-val" style="font-size:14px;">' + esc(lg.gameLabel) + '</div></div>' +
     '<div class="rh-stat"><div class="rh-label">Players</div><div class="rh-val">' + lg.numPlayers + '</div></div>' +
     '<div class="rh-stat"><div class="rh-label">ITM</div><div class="rh-val">' + lg.itmCount + '</div></div>' +
@@ -1800,26 +1843,26 @@ function renderResults() {
   '</tr></thead><tbody>';
 
   lg.players.forEach(function(p) {
-    var rc = p.rank===1?'rank-1':p.rank===2?'rank-2':p.rank===3?'rank-3':'rank-other';
-    var total = p.chips + (hasBounty ? p.bounty : 0);
+    var rc      = p.rank===1?'rank-1':p.rank===2?'rank-2':p.rank===3?'rank-3':'rank-other';
+    var total   = p.chips + (hasBounty ? p.bounty : 0);
     var chipCls = p.chips > 0 ? 'td-chips-pos' : 'td-zero';
     html += '<tr>' +
       '<td class="td-rank ' + rc + '">' + p.rank + '</td>' +
       '<td class="td-player">' + esc(p.player) + '</td>' +
       '<td class="td-pts">' + fmtNum(p.points) + '</td>' +
       '<td class="' + chipCls + '">' + (p.chips > 0 ? fmtChips(p.chips) : '—') + '</td>' +
-      (hasBounty ? '<td class="td-pts">' + (p.bounty>0?fmtChips(p.bounty):'—') + '</td><td class="td-pts">' + (total>0?fmtChips(total):'—') + '</td>' : '') +
+      (hasBounty ? '<td class="td-pts">' + (p.bounty>0?fmtChips(p.bounty):'—') + '</td>' +
+                   '<td class="td-pts">' + (total>0?fmtChips(total):'—') + '</td>' : '') +
     '</tr>';
   });
 
   html += '</tbody></table></div></div>';
   el.innerHTML = html;
 
-  // Render podium
-  var podEl = document.getElementById('res-podium-inner');
-  if (podEl) renderPodium('res-podium-inner', lg.players.map(function(p){
+  // Render podium into the newly created element
+  renderPodium('res-podium-inner', lg.players.map(function(p){
     return {rank:p.rank, player:p.player, total:p.points};
-  }), lg.gameLabel);
+  }), lg.gameLabel + ' — ' + slotLabel);
 }
 
 // ── CALENDAR ──────────────────────────────────────────────────

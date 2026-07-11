@@ -179,32 +179,33 @@ body.light .site-header {
   pointer-events:none;
 }
 .hdr-runes {
-  font-size: 11px;
-  color: var(--wh-dim);
+  font-size: 14px;
+  color: var(--wh-light);
   letter-spacing: .4em;
   margin-bottom: 6px;
   font-family: 'Cinzel', serif;
-  opacity: .7;
 }
+body.light .hdr-runes { color: var(--wh-dim); opacity: .7; }
 .hdr-title {
   font-family: 'Cinzel Decorative', 'Cinzel', serif;
   font-weight: 700;
-  font-size: clamp(20px, 4.5vw, 44px);
-  color: var(--wh-light);
+  font-size: clamp(25px, 5.625vw, 55px);
+  color: #d4eaf8;
   letter-spacing: .06em;
   line-height: 1.15;
-  text-shadow: 0 0 28px var(--wh-glow), 0 2px 0 rgba(0,0,0,.5);
+  text-shadow: 0 0 36px var(--wh-glow), 0 0 12px rgba(125,179,204,.25), 0 2px 0 rgba(0,0,0,.5);
 }
-body.light .hdr-title { color: var(--wh-dark); }
+body.light .hdr-title { color: var(--wh-dark); text-shadow: none; }
 .hdr-sub {
   font-family: 'Cinzel', serif;
-  font-size: 11px;
-  color: var(--text-dim);
+  font-size: 14px;
+  color: var(--wh-light);
   letter-spacing: .22em;
   text-transform: uppercase;
   margin-top: 4px;
   margin-bottom: 14px;
 }
+body.light .hdr-sub { color: var(--text-dim); }
 .hdr-avatar-wrap {
   margin: 0 auto 14px;
   display: flex; align-items: center; justify-content: center;
@@ -228,14 +229,15 @@ body.light .hdr-title { color: var(--wh-dark); }
 }
 .hdr-badge {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px;
-  border: 1px solid var(--border-wh);
+  padding: 4px 13px;
+  border: 1px solid var(--wh-dim);
   border-radius: 20px;
   background: var(--bg-panel);
-  font-size: 11px;
-  color: var(--text-dim);
+  font-size: 14px;
+  color: var(--wh-light);
   letter-spacing: .05em;
 }
+body.light .hdr-badge { border-color: var(--border-wh); color: var(--text-dim); }
 .hdr-badge .dot {
   width: 6px; height: 6px;
   border-radius: 50%;
@@ -245,19 +247,22 @@ body.light .hdr-title { color: var(--wh-dark); }
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.85);}}
 .hdr-btn {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 14px;
-  border: 1px solid var(--border-wh);
+  padding: 5px 17px;
+  border: 1px solid var(--wh-dim);
   border-radius: 20px;
   background: var(--bg-panel);
-  color: var(--text-dim);
-  font-size: 11px;
+  color: var(--wh-light);
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all .2s;
   letter-spacing: .04em;
 }
-.hdr-btn:hover { background: var(--bg-row); border-color: var(--wh); color: var(--wh-light); }
-.hdr-updated { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+.hdr-btn:hover { background: var(--bg-row); border-color: var(--wh); color: #d4eaf8; }
+body.light .hdr-btn { border-color: var(--border-wh); color: var(--text-dim); }
+body.light .hdr-btn:hover { color: var(--wh-light); }
+.hdr-updated { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+body.light .hdr-updated { color: var(--text-muted); }
 
 /* ── LAYOUT ──────────────────────────────────────────────── */
 .app-body { display:flex; flex:1; overflow:hidden; }
@@ -1378,9 +1383,21 @@ function loadData(force) {
       } catch(e) {}
     }
   }
+
+  var refreshBtn = null;
+  if (force) {
+    // Clear all cached data so every tab re-fetches fresh content
+    GAME_BOARDS = null; STATS_DATA = null; PR_PLAYERS = null; PR_QR_CACHE = {}; TOURNAMENTS = null;
+    gameBoardsLoading = false; statsLoading = false; prPlayersLoading = false; tournsLoading = false;
+    sessionStorage.removeItem('wh_primary');
+    refreshBtn = document.querySelector('.hdr-btn[onclick="loadData(true)"]');
+    if (refreshBtn) { refreshBtn.textContent = '↺ Refreshing…'; refreshBtn.disabled = true; }
+  }
+
   setLsMsg('Fetching live data from Google Sheets…');
   google.script.run
     .withSuccessHandler(function(j) {
+      if (refreshBtn) { refreshBtn.textContent = '↺ Refresh'; refreshBtn.disabled = false; }
       if (j && j.error) {
         document.getElementById('err-msg').textContent = j.error;
         document.getElementById('error-screen').classList.add('visible');
@@ -1390,8 +1407,10 @@ function loadData(force) {
       try { sessionStorage.setItem('wh_primary', JSON.stringify(j)); } catch(e) {}
       applyPrimary(j);
       hideLoading();
+      if (force) switchTab(STATE.tab); // re-render current tab with fresh data
     })
     .withFailureHandler(function(e) {
+      if (refreshBtn) { refreshBtn.textContent = '↺ Refresh'; refreshBtn.disabled = false; }
       document.getElementById('err-msg').textContent = (e && e.message) || 'Network error.';
       document.getElementById('error-screen').classList.add('visible');
       document.getElementById('loading-screen').style.display = 'none';
@@ -1574,9 +1593,20 @@ function renderPodium(containerId, rows, gameLabel) {
   var top3 = rows.slice(0, 3);
   if (!top3.length) { el.innerHTML = '<div class="no-data">No data for this period</div>'; return; }
 
-  var rankClass = ['rank-1','rank-2','rank-3'];
+  // Compute tied ranks by comparing totals
+  var dispRank = [];
+  top3.forEach(function(p, i) {
+    var val = p.total !== undefined ? p.total : p.points;
+    if (i === 0) { dispRank[i] = 1; return; }
+    var prev = top3[i-1], prevVal = prev.total !== undefined ? prev.total : prev.points;
+    dispRank[i] = (val === prevVal) ? dispRank[i-1] : i + 1;
+  });
+  var rankCounts = {};
+  dispRank.forEach(function(r){ rankCounts[r] = (rankCounts[r]||0) + 1; });
+
+  var ordinals   = ['1ST','2ND','3RD'];
+  var ringClass  = ['rank-1','rank-2','rank-3'];
   var blockClass = ['b1','b2','b3'];
-  var blockNum   = ['1','2','3'];
 
   // Order: 2nd | 1st | 3rd for podium layout
   var order = [1,0,2].filter(function(i){return i < top3.length;});
@@ -1585,18 +1615,20 @@ function renderPodium(containerId, rows, gameLabel) {
   if (gameLabel) html += '<div class="podium-game-label">' + gameLabel + '</div>';
 
   order.forEach(function(i) {
-    var p = top3[i];
-    var rc = rankClass[i] || '';
-    var bc = blockClass[i] || 'b3';
-    var init = ((p.player || '?').replace(/^_+/, '') || '?').charAt(0).toUpperCase();
-    var pts  = fmtNum(p.total !== undefined ? p.total : p.points);
-    var rankLabel = i === 0 ? '1st' : i === 1 ? '2nd' : '3rd';
+    var p      = top3[i];
+    var dr     = dispRank[i];
+    var isTied = rankCounts[dr] > 1;
+    var label  = isTied ? ('T' + dr) : ordinals[dr - 1];
+    var rc     = ringClass[dr - 1] || 'rank-3';   // ring color follows tied rank
+    var bc     = blockClass[dr - 1] || 'b3';      // pedestal height follows tied rank
+    var init   = ((p.player || '?').replace(/^_+/, '') || '?').charAt(0).toUpperCase();
+    var pts    = fmtNum(p.total !== undefined ? p.total : p.points);
     html += '<div class="pp-pedestal">' +
               '<div class="pp-avatar ' + rc + '">' + init + '</div>' +
               '<div class="pp-pts">' + pts + '</div>' +
               '<div class="pp-name">' + esc(p.player) + '</div>' +
-              '<div class="pp-rank">' + rankLabel + '</div>' +
-              '<div class="pp-block ' + bc + '">' + blockNum[i] + '</div>' +
+              '<div class="pp-rank">' + label + '</div>' +
+              '<div class="pp-block ' + bc + '">' + (isTied ? 'T'+dr : dr) + '</div>' +
             '</div>';
   });
 
@@ -1710,11 +1742,15 @@ function renderGames() {
 
   renderPodium('gm-podium', rows, GAME_FULL[STATE.gameKey]);
 
-  // Bounty podium: re-rank players by best-4 bounty total for this genre/slot
-  var btyRows = rows.slice()
+  // Bounty podium: re-sort by bounties, assign tied ranks
+  var btyArr = rows.slice()
     .filter(function(r){ return (r.bounties || 0) > 0; })
-    .sort(function(a,b){ return (b.bounties || 0) - (a.bounties || 0); })
-    .map(function(r, i){ return {rank: i+1, player: r.player, total: r.bounties}; });
+    .sort(function(a,b){ return (b.bounties || 0) - (a.bounties || 0); });
+  var btyRank = 1;
+  var btyRows = btyArr.map(function(r, i) {
+    if (i > 0 && (r.bounties || 0) < (btyArr[i-1].bounties || 0)) btyRank = i + 1;
+    return {rank: btyRank, player: r.player, total: r.bounties};
+  });
   renderPodium('gm-bounty-podium', btyRows, GAME_FULL[STATE.gameKey]);
 
   renderGmTable(rows);
